@@ -1,0 +1,189 @@
+body, html {
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    height: 100%;
+    font-family: Roboto, sans-serif;
+    background-image: url("background.jpg");
+    background-size: cover;
+    overflow: hidden; /* Prevent scrolling beyond viewport */
+}
+
+#canvas {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.panel, .note {
+    width: 400px; /* Initial and minimum size */
+    height: 300px; /* Initial and minimum size */
+    min-width: 200px;
+    min-height: 200px;
+    padding: 10px;
+    position: absolute;
+    border: none;
+    background-color: #303030;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Ensure content doesn't overflow */
+    opacity: 0.8;
+    border-radius: 5px;
+}
+
+.panel-title {
+    font-size: larger;
+    font-weight: 600;
+    border-style: none;
+    padding-bottom: 10px;
+    width: 96%;
+    background-color: #303030;
+    color: #ffffff;
+}
+
+.panel-title:focus {
+    outline: none; /* Remove the default focus outline */
+    border: none; /* Remove the border when in focus */
+}
+
+.note-body {
+    border-style: none;
+    padding-bottom: 10px;
+    width: 96%;
+    background-color: #303030;
+    color: #cecece;
+    word-wrap: break-word;
+}
+
+.note-body:focus {
+    outline: none; /* Remove the default focus outline */
+    border: none; /* Remove the border when in focus */
+}
+
+.handle {
+    width: 40px;
+    height: 5px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    margin: 5px auto 10px; /* Centered horizontally, thinner */
+    cursor: grab;
+}
+
+.todo-list {
+    width: 100%; /* Ensure it resizes with the panel */
+    flex-grow: 1; /* Fill available space */
+    padding: 0;
+    margin: 0;
+    list-style-type: none; /* Remove default list styling */
+}
+
+.todo-item {
+    display: flex;
+    align-items: center; /* Vertical alignment */
+    justify-content: flex-start; /* Align items to the left */
+    padding-bottom: 5px;
+    color: #ffffff;
+}
+
+.todo-input {
+    border-style: none;
+    width: 96%;
+    background-color: #303030;
+    color: #ffffff;
+}
+
+.drag-handle {
+    cursor: grab;
+    border-radius: 50%; /* Circular appearance */
+    margin-right: 10px; /* Space before the text */
+    opacity: 0.5; /* Greyed out for subtlety */
+}
+
+.editable {
+    flex-grow: 1; /* Allow the editable area to fill the space */
+    margin: 0 5px; /* Spacing for aesthetics */
+}
+
+.editable:focus {
+    outline: none; /* Remove the default focus outline */
+}
+
+.sortable-placeholder {
+    border: 1px dashed #ccc;
+    background: #f0f0f0;
+    height: 1.5rem;
+    margin: 5px 0; /* Match todo item margin for consistent spacing */
+}
+ 
+.delete-panel {
+    position: absolute;
+    top: 5px;
+    right: 2px;
+    background: none;
+    color: #9c9c9c;
+    border: none;
+    font-size: 10px;
+    cursor: pointer;
+    opacity: 0.5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-panel:hover {
+    color: #ffffff;
+    opacity: 1;
+}
+
+.completed {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+/* Place the navbar at the top of the page, and make it stick */
+.navbar {
+    background-color: #303030;
+    overflow: hidden;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex; /* Add this line to enable flexbox */
+    justify-content: center; /* Center the buttons horizontally */
+}
+  
+/* Style the links inside the navigation bar */
+.navbar {
+    display: flex; /* Add this line to enable flexbox */
+    flex-direction: row; /* Align buttons horizontally */
+    opacity: 0.6;
+}
+
+.navbar button {
+    display: flex;
+    outline: none;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 15px;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 10px 20px;
+    border: 1px solid #222222;
+    transition: box-shadow 0.2s ease 0s, -ms-transform 0.1s ease 0s, -webkit-transform 0.1s ease 0s, transform 0.1s ease 0s;
+    background: #fff;
+    color: #222222;
+    margin: 5px;
+}
+  
+  /* Change the color of links on hover */
+  .navbar button:hover {
+    background-color: #ddd;
+    color: black;
+  }
+  
+  /* Add a color to the active/current link */
+  .navbar button.active {
+    background-color: #757575;
+    color: white;
+  }
+
