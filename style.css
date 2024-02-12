@@ -150,6 +150,7 @@ body, html {
     width: 100%;
     display: flex; /* Add this line to enable flexbox */
     justify-content: center; /* Center the buttons horizontally */
+    opacity: 0.3;
 }
   
 /* Style the links inside the navigation bar */
@@ -168,10 +169,10 @@ body, html {
     font-weight: 500;
     border-radius: 8px;
     padding: 10px 20px;
-    border: 1px solid #222222;
+    border: 1px solid #fff; /* Change border color to white */
     transition: box-shadow 0.2s ease 0s, -ms-transform 0.1s ease 0s, -webkit-transform 0.1s ease 0s, transform 0.1s ease 0s;
-    background: #fff;
-    color: #222222;
+    background: transparent; /* Set background to transparent */
+    color: #fff; /* Set text color to white */
     margin: 5px;
 }
   

@@ -1,5 +1,6 @@
 // When the document is ready, execute this function
-$(document).ready(function() {  
+$(document).ready(function() { 
+    
     // Event handler for adding a new panel
     $('#addPanel').click(function() {
         // Count the number of existing panels to generate a unique ID
@@ -111,7 +112,7 @@ $(document).ready(function() {
             <div class="handle"></div> <!-- Handle for dragging the panel -->
             <button class="delete-panel">X</button> <!-- Delete button -->
             <input type="text" class="panel-title" value="Note ${noteCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}"> <!-- Input field for the panel title -->
-            <div class="note-body" contenteditable="true">Enter text</div> <!-- Text area for the panel body -->
+            <div class="note-body" contenteditable="true"></div> <!-- Text area for the panel body -->
         </div>`;
 
         // Append the new panel to the canvas
@@ -127,6 +128,33 @@ $(document).ready(function() {
             minWidth: 200, // Set the minimum width of the panel
             grid: [grid_size, grid_size] // Set the grid size to snap to during resizing
         });
+    });
+
+    // Add a new button for saving the panels to a text file
+    $('#saveToFile').click(function() {
+        var data = '';
+        // Iterate over all panels
+        $('.panel, .note').each(function() {
+            var title = $(this).find('.panel-title').val(); // Get the panel title
+            var content = '';
+            if ($(this).hasClass('panel')) {
+                // If it's a todo panel, get the todo items
+                $(this).find('.todo-item').each(function() {
+                    content += $(this).find('.editable').text() + '\n';
+                });
+            } else if ($(this).hasClass('note')) {
+                // If it's a note panel, get the note body
+                content = $(this).find('.note-body').text();
+            }
+            // Append the panel title and content to the data string
+            data += 'Title: ' + title + '\n' + 'Content: ' + content + '\n\n';
+        });
+        // Save the data to a text file
+        var blob = new Blob([data], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, "panels.txt");
+
+        // Show success message
+        swal("Success!", "Panels saved to file.", "success");
     });
 
 });
