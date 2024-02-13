@@ -188,3 +188,25 @@ body, html {
     color: white;
   }
 
+  .editable-title {
+    text-align: center;
+    margin-top: 12px;
+    cursor: pointer;
+    color: #ffffff;
+    opacity: 0.8;
+    font-size: 32px;
+}
+
+.title-input {
+    background: transparent;
+    border-style: none;
+    /* Remove the border property */
+    /* Retain other styles for consistent appearance */
+    text-align: center;
+    width: 100%;
+    margin-top: 12px;
+    color: #ffffff;
+    font-size: 32px;
+}
+
+
