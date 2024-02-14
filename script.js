@@ -1,20 +1,19 @@
 // When the document is ready, execute this function
 $(document).ready(function() { 
     
-    // Event handler for adding a new panel
+    // Declare vaiables
+    var grid_size = 50; // Define the grid size
+    var panel_width = 200; // Define the default panel width
+    var panel_height = 200; // Define the default panel height
+    var centerX = Math.round(($('#canvas').width() / 2 - panel_width / 2) / grid_size) * grid_size;// Calculate the center x position for the new panel
+    var centerY = Math.round(($('#canvas').height() / 2 - panel_height / 2) / grid_size) * grid_size;// Calculate the center y position for the new panel
+    
+    // Event handler for adding a new checklist
     $('#addPanel').click(function() {
         // Count the number of existing panels to generate a unique ID
         var panelCount = $('.panel').length + 1;
         var panelId = 'panel-' + panelCount;
-
-        // Calculate the center position for the new panel
-        var grid_size = 50; // Define the grid size
-        var panel_width = 200; // Define the panel width
-        var panel_height = 200; // Define the panel height
-        var centerX = Math.round(($('#canvas').width() / 2 - panel_width / 2) / grid_size) * grid_size;
-        var centerY = Math.round(($('#canvas').height() / 2 - panel_height / 2) / grid_size) * grid_size;// Calculate the center position for the new panel
     
-
         // HTML markup for the new panel
         var panelHtml = `<div class="panel" id="${panelId}" style="left:${centerX}px; top:${centerY}px;">
         <div class="handle"></div> <!-- Handle for dragging the panel -->
@@ -24,6 +23,27 @@ $(document).ready(function() {
         <input type="text" class="todo-input" placeholder="Add new todo"/> <!-- Input field for adding new todos -->
         </div>`;
 
+        createPanel(panelHtml, panelId);
+    });
+
+    //Add a note
+    $('#addNote').click(function() {
+        // Count the number of existing panels to generate a unique ID
+        var noteCount = $('.note').length + 1;
+        var panelId = 'note-' + noteCount;
+
+        // HTML markup for the new panel
+        var panelHtml = `<div class="note" id="${panelId}" style="left:${centerX}px; top:${centerY}px;">
+            <div class="handle"></div> <!-- Handle for dragging the panel -->
+            <button class="delete-panel">X</button> <!-- Delete button -->
+            <input type="text" class="panel-title" value="Note ${noteCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}"> <!-- Input field for the panel title -->
+            <div class="note-body" contenteditable="true"></div> <!-- Text area for the panel body -->
+        </div>`;
+
+        createPanel(panelHtml, panelId);
+    });
+
+    function createPanel(panelHtml, panelId) {
         // Append the new panel to the canvas
         $('#canvas').append(panelHtml);
 
@@ -43,7 +63,7 @@ $(document).ready(function() {
             handle: ".drag-handle", // Specify the handle for sorting
             placeholder: "sortable-placeholder" // Specify the placeholder for sorting
         }).disableSelection(); // Disable text selection while sorting
-    });
+    }    
 
     // Event handler for deleting a panel or note
     $(document).on('click', '.delete-panel', function() {
@@ -80,7 +100,6 @@ $(document).ready(function() {
         });
     });
 
-
     // Event handler for updating todo item text
     $(document).on('blur', '.editable[contenteditable="true"]', function() {
         $(this).attr('contenteditable', 'false'); // Disable editing
@@ -91,43 +110,6 @@ $(document).ready(function() {
     // Event handler for marking a todo item as completed
     $(document).on('click', '.todo-checkbox', function() {
         $(this).parent().toggleClass('completed');
-    });
-
-    //Add a note
-    $('#addNote').click(function() {
-        // Count the number of existing panels to generate a unique ID
-        var noteCount = $('.note').length + 1;
-        var panelId = 'note-' + noteCount;
-
-        // Calculate the center position for the new panel
-        var grid_size = 50; // Define the grid size
-        var panel_width = 200; // Define the panel width
-        var panel_height = 200; // Define the panel height
-        var centerX = Math.round(($('#canvas').width() / 2 - panel_width / 2) / grid_size) * grid_size;
-        var centerY = Math.round(($('#canvas').height() / 2 - panel_height / 2) / grid_size) * grid_size;// Calculate the center position for the new panel
-    
-
-        // HTML markup for the new panel
-        var panelHtml = `<div class="note" id="${panelId}" style="left:${centerX}px; top:${centerY}px;">
-            <div class="handle"></div> <!-- Handle for dragging the panel -->
-            <button class="delete-panel">X</button> <!-- Delete button -->
-            <input type="text" class="panel-title" value="Note ${noteCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}"> <!-- Input field for the panel title -->
-            <div class="note-body" contenteditable="true"></div> <!-- Text area for the panel body -->
-        </div>`;
-
-        // Append the new panel to the canvas
-        $('#canvas').append(panelHtml);
-
-        $('#' + panelId).draggable({
-            handle: ".handle", // Specify the handle for dragging
-            cancel: ".panel-title, .editable", // Specify elements to exclude from dragging
-            grid: [grid_size, grid_size], // Set the grid size to snap to during dragging
-            containment: "#canvas" // Specify the containment element
-        }).resizable({
-            minHeight: 200, // Set the minimum height of the panel
-            minWidth: 200, // Set the minimum width of the panel
-            grid: [grid_size, grid_size] // Set the grid size to snap to during resizing
-        });
     });
 
     // Function to save a text file to a local folder
@@ -274,6 +256,4 @@ $(document).ready(function() {
         });
         
     }
-    
-
 });
