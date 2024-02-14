@@ -1,6 +1,6 @@
 // When the document is ready, execute this function
 $(document).ready(function() { 
-    
+   
     // Declare vaiables
     var grid_size = 50; // Define the grid size
     var panel_width = 200; // Define the default panel width
@@ -8,6 +8,19 @@ $(document).ready(function() {
     var centerX = Math.round(($('#canvas').width() / 2 - panel_width / 2) / grid_size) * grid_size;// Calculate the center x position for the new panel
     var centerY = Math.round(($('#canvas').height() / 2 - panel_height / 2) / grid_size) * grid_size;// Calculate the center y position for the new panel
     
+    
+    // THIS DOESN'T WORK
+    $(document).ready(function() {
+        var lastLoadedBoard = localStorage.getItem('lastLoadedBoard'); // Get the filename from local storage
+        fetch(lastLoadedBoard + '.json')
+        .then(response => response.json())
+        .then(data => {
+            // Use this data to load the board
+            loadBoardFromData(data);
+        })
+        .catch(error => console.error('Error:', error));
+    }); 
+
     // Event handler for adding a new checklist
     $('#addChecklist').click(function() {
         // Count the number of existing panels to generate a unique ID
@@ -143,6 +156,7 @@ $(document).ready(function() {
         var boardData = collectBoardData();
         var text = boardData; // JSON string of board data
         var filename = $("#canvasTitle").text() + ".json"; // Append .json to the filename
+        localStorage.setItem('lastLoadedBoard', filename);
         var blob = new Blob([text], {type: "application/json;charset=utf-8"}); // Specify JSON MIME type
         var url = URL.createObjectURL(blob);
         var a = document.createElement("a");
@@ -213,6 +227,7 @@ $(document).ready(function() {
     });
 
     function loadBoardFromData(boardData) {
+                
         // Clear existing panels and notes
         $('.checklist, .note').remove();
 
@@ -247,6 +262,8 @@ $(document).ready(function() {
             }
             createPanel(panelHtml, item.id);
         });
+
         
     }
+    
 });
