@@ -209,4 +209,91 @@ body, html {
     font-size: 32px;
 }
 
+.table-panel {
+    width: 500px;
+    height: 300px;
+    min-width: 200px;
+    min-height: 200px;
+    padding: 10px;
+    position: relative; /* Ensure it can contain absolute elements */
+    background-color: #303030; /* Matching the checklist and note background */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    opacity: 0.8;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    color: #ffffff; /* Ensuring text color consistency */
+    overflow: hidden; /* Allow table content to scroll */
+}
+
+/* Enhancing table appearance */
+.table-panel .editable-table {
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    border-collapse: collapse;
+    margin-top: 10px;
+    background-color: #383838; /* Slightly different to add depth */
+}
+
+.table-panel .editable-table th,
+.table-panel .editable-table td {
+    border: 1px solid #555; /* Subtle borders for cells */
+    padding: 8px;
+    text-align: left;
+    color: #cecece; /* Light text for readability */
+}
+
+.table-panel .editable-table th {
+    background-color: #303030; /* Header background to match panel */
+}
+
+.table-panel .editable-table tr:nth-child(even) {
+    background-color: #404040; /* Alternating row color for better readability */
+}
+
+.table-panel .editable-table tr:hover {
+    background-color: #505050; /* Hover state for rows */
+}
+
+.table-panel .editable-table .editing input {
+    width: calc(100% - 16px); /* Full width of cell, accounting for padding */
+    padding: 7px;
+    background-color: #303030; /* Input background */
+    color: #ffffff; /* Input text color */
+    border: none; /* Removing default input border */
+}
+
+/* Plus symbol at the bottom of the table for adding rows */
+.table-panel .add-row-symbol {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 25px;
+    height: 25px;
+    line-height: 25px;
+    text-align: center;
+    cursor: pointer;
+    background-color: #303030; /* Match panel color */
+    color: #ffffff;
+    font-size: 22px;
+    user-select: none; /* Prevent text selection */
+}
+
+/* Plus symbol at the right of the table for adding columns */
+.table-panel .add-column-symbol {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    width: 25px;
+    height: 25px;
+    line-height: 25px;
+    text-align: center;
+    cursor: pointer;
+    background-color: #303030; /* Match panel color */
+    color: #ffffff;
+    font-size: 22px;
+    user-select: none; /* Prevent text selection */
+}
 

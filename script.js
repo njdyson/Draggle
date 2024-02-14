@@ -31,7 +31,7 @@ $(document).ready(function() {
         var panelHtml = `<div class="checklist" id="${panelId}" style="left:${centerX}px; top:${centerY}px;">
         <div class="handle"></div> <!-- Handle for dragging the panel -->
         <button class="delete-panel">X</button> <!-- Delete button -->
-        <input type="text" class="panel-title" value="Checklist ${checklistCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}"> <!-- Input field for the panel title -->
+        <input type="text" class="panel-title" value="Checklist ${checklistCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
         <ul class="todo-list"></ul> <!-- List for todo items -->
         <input type="text" class="todo-input" placeholder="Add new todo"/> <!-- Input field for adding new todos -->
         </div>`;
@@ -49,12 +49,36 @@ $(document).ready(function() {
         var panelHtml = `<div class="note" id="${panelId}" style="left:${centerX}px; top:${centerY}px;">
             <div class="handle"></div> <!-- Handle for dragging the panel -->
             <button class="delete-panel">X</button> <!-- Delete button -->
-            <input type="text" class="panel-title" value="Note ${noteCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}"> <!-- Input field for the panel title -->
+            <input type="text" class="panel-title" value="Note ${noteCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
             <div class="note-body" contenteditable="true"></div> <!-- Text area for the panel body -->
         </div>`;
 
         createPanel(panelHtml, panelId);
-    });   
+    });
+    
+    $('#addTable').click(function() {
+        var tableCount = $('.table-panel').length + 1;
+        var panelId = 'table-' + tableCount;
+    
+        var panelHtml = `<div class="table-panel" id="${panelId}" style="left:${centerX}px; top:${centerY}px;">
+            <div class="handle"></div>
+            <button class="delete-panel">X</button>
+            <input type="text" class="panel-title" value="Table ${tableCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
+            <div class="table-container">
+                <table class="editable-table">
+                    <tr><th></th><th></th></tr>
+                    <tr><td></td><td></td></tr>
+                </table>
+            </div>
+            <div class="add-row-symbol">+</div>
+            <div class="add-column-symbol">+</div>
+        </div>`;
+    
+        createPanel(panelHtml, panelId);
+        // Call function to make table cells editable
+        makeCellsEditable();
+        positionPlusSymbols(panelId);
+    });
 
     function createPanel(panelHtml, panelId) {
         // Append the new panel to the canvas
@@ -112,6 +136,53 @@ $(document).ready(function() {
             e.stopPropagation();
         });
     });
+
+    function makeCellsEditable() {
+        $(document).on('click', '.editable-table th, .editable-table td', function() {
+            var $cell = $(this);
+            if (!$cell.is('.editing')) {
+                var cellText = $cell.text();
+                $cell.addClass('editing').html('<input type="text" value="' + cellText + '">').find('input').focus();
+            }
+    
+            $cell.on('blur', 'input', function() {
+                var newText = $(this).val();
+                $cell.removeClass('editing').html(newText);
+            }).on('keypress', function(e) {
+                if (e.which == 13) { // Enter key pressed
+                    $(this).blur(); // Trigger blur to save
+                }
+            });
+        });
+    }
+
+    $(document).on('click', '.add-row-symbol', function() {
+        var $table = $(this).siblings('.table-container').find('table');
+        var $lastRow = $table.find('tr:last');
+        var newRow = $lastRow.clone();
+        newRow.find('td').text(''); // Clear the text in new row cells
+        $table.append(newRow);
+
+    });
+
+    $(document).on('click', '.add-column-symbol', function() {
+        var $table = $(this).siblings('.table-container').find('table');
+        // Add a new column header
+        var columnHeader = "<th></th>";
+        $table.find('tr:first').append(columnHeader);
+      
+        // Add a new cell to each row in the table body
+        $table.find('tr').each(function() {
+            if ($(this).find('th').length === 0) { // It's not a header row
+                $(this).append('<td></td>');
+            }
+        });
+    
+        // Call function to make new cells editable
+        makeCellsEditable();
+
+    });
+    
 
     // Event handler for updating todo item text
     $(document).on('blur', '.editable[contenteditable="true"]', function() {
