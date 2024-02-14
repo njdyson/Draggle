@@ -9,16 +9,16 @@ $(document).ready(function() {
     var centerY = Math.round(($('#canvas').height() / 2 - panel_height / 2) / grid_size) * grid_size;// Calculate the center y position for the new panel
     
     // Event handler for adding a new checklist
-    $('#addPanel').click(function() {
+    $('#addChecklist').click(function() {
         // Count the number of existing panels to generate a unique ID
-        var panelCount = $('.panel').length + 1;
-        var panelId = 'panel-' + panelCount;
+        var checklistCount = $('.checklist').length + 1;
+        var panelId = 'checklist-' + checklistCount;
     
         // HTML markup for the new panel
-        var panelHtml = `<div class="panel" id="${panelId}" style="left:${centerX}px; top:${centerY}px;">
+        var panelHtml = `<div class="checklist" id="${panelId}" style="left:${centerX}px; top:${centerY}px;">
         <div class="handle"></div> <!-- Handle for dragging the panel -->
         <button class="delete-panel">X</button> <!-- Delete button -->
-        <input type="text" class="panel-title" value="Todo List ${panelCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}"> <!-- Input field for the panel title -->
+        <input type="text" class="panel-title" value="Checklist ${checklistCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}"> <!-- Input field for the panel title -->
         <ul class="todo-list"></ul> <!-- List for todo items -->
         <input type="text" class="todo-input" placeholder="Add new todo"/> <!-- Input field for adding new todos -->
         </div>`;
@@ -41,7 +41,7 @@ $(document).ready(function() {
         </div>`;
 
         createPanel(panelHtml, panelId);
-    });
+    });   
 
     function createPanel(panelHtml, panelId) {
         // Append the new panel to the canvas
@@ -112,22 +112,6 @@ $(document).ready(function() {
         $(this).parent().toggleClass('completed');
     });
 
-    // Function to save a text file to a local folder
-    function saveTextFile() {
-        var boardData = collectBoardData();
-        var text = boardData; // JSON string of board data
-        var filename = $("#canvasTitle").text() + ".json"; // Append .json to the filename
-        var blob = new Blob([text], {type: "application/json;charset=utf-8"}); // Specify JSON MIME type
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement("a");
-        a.href = url;
-        a.download = filename; // Specify the file name
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
-
     // Event handler for saving the text file when the saveToFile button is pressed
     $('#saveToFile').click(function() {
         saveTextFile();
@@ -154,22 +138,38 @@ $(document).ready(function() {
     // Initialize the editable title functionality
     makeTitleEditable();
 
+    // Function to save a text file to a local folder
+    function saveTextFile() {
+        var boardData = collectBoardData();
+        var text = boardData; // JSON string of board data
+        var filename = $("#canvasTitle").text() + ".json"; // Append .json to the filename
+        var blob = new Blob([text], {type: "application/json;charset=utf-8"}); // Specify JSON MIME type
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = filename; // Specify the file name
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
     function collectBoardData() {
         var boardData = {
-            boardTitle: $("#canvasTitle").text(), // Assuming the board title has the ID 'canvasTitle'
+            boardTitle: $("#canvasTitle").text(),
             items: []
         };
     
-        // Iterate through all panels
-        $('.panel').each(function() {
+        // Iterate through all checklists
+        $('.checklist').each(function() {
             var panel = $(this);
             var item = {
                 id: panel.attr('id'),
-                type: 'todo',
+                type: 'checklist',
                 location: { top: panel.css('top'), left: panel.css('left') },
                 size: { width: panel.width(), height: panel.height() },
                 title: panel.find('.panel-title').val(),
-                content: panel.find('.todo-list').text() // Assuming list items are plain text
+                content: panel.find('.todo-list').html() // Capture the HTML content of the todo-list
             };
             boardData.items.push(item);
         });
@@ -183,7 +183,7 @@ $(document).ready(function() {
                 location: { top: note.css('top'), left: note.css('left') },
                 size: { width: note.width(), height: note.height() },
                 title: note.find('.panel-title').val(),
-                content: note.find('.note-body').html() // Capturing HTML content
+                content: note.find('.note-body').text()
             };
             boardData.items.push(item);
         });
@@ -214,45 +214,38 @@ $(document).ready(function() {
 
     function loadBoardFromData(boardData) {
         // Clear existing panels and notes
-        $('.panel, .note').remove();
+        $('.checklist, .note').remove();
 
         // Reset panel count if necessary
-        var panelCount = 0;
+        var checklistCount = 0;
+        var noteCount = 0;
 
         // Set the board title
         $("#canvasTitle").text(boardData.boardTitle);
 
         boardData.items.forEach(function(item) {
-            if (item.type === 'todo') {
-                panelCount++;
+            if (item.type === 'checklist') {
+                checklistCount++;
                 var panelHtml = `
-                    <div class="panel" id="${item.id}" style="left:${item.location.left}; top:${item.location.top}; width: ${item.size.width}px; height: ${item.size.height}px;">
+                    <div class="checklist" id="${item.id}" style="left:${item.location.left}; top:${item.location.top}; width: ${item.size.width}px; height: ${item.size.height}px;">
                         <div class="handle"></div>
                         <button class="delete-panel">X</button>
                         <input type="text" class="panel-title" value="${item.title}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
                         <ul class="todo-list">${item.content}</ul>
-                        <input type="text" class="todo-input" placeholder="Add new todo"/>
+                        <input type="text" class="todo-input" placeholder="Add new item"/>
                     </div>`;
-
-                $('#canvas').append(panelHtml);
-
-                $('#' + panelId).draggable({
-                    handle: ".handle", // Specify the handle for dragging
-                    cancel: ".panel-title, .editable", // Specify elements to exclude from dragging
-                    grid: [grid_size, grid_size], // Set the grid size to snap to during dragging
-                    containment: "#canvas" // Specify the containment element
-                }).resizable({
-                    minHeight: 200, // Set the minimum height of the panel
-                    minWidth: 200, // Set the minimum width of the panel
-                    grid: [grid_size, grid_size] // Set the grid size to snap to during resizing
-                });
-        
-                // Make the todo items sortable
-                $('.todo-list').sortable({
-                    handle: ".drag-handle", // Specify the handle for sorting
-                    placeholder: "sortable-placeholder" // Specify the placeholder for sorting
-                }).disableSelection(); // Disable text selection while sorting
             }
+            else if (item.type === 'note') {
+                noteCount++;
+                var panelHtml = `
+                    <div class="note" id="${item.id}" style="left:${item.location.left}; top:${item.location.top}; width: ${item.size.width}px; height: ${item.size.height}px;">
+                        <div class="handle"></div>
+                        <button class="delete-panel">X</button>
+                        <input type="text" class="panel-title" value="${item.title}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
+                        <div class="note-body" contenteditable="true">${item.content}</div>
+                    </div>`;
+            }
+            createPanel(panelHtml, item.id);
         });
         
     }

@@ -15,7 +15,7 @@ body, html {
     overflow: hidden;
 }
 
-.panel, .note {
+.checklist, .note {
     width: 400px; /* Initial and minimum size */
     height: 300px; /* Initial and minimum size */
     min-width: 200px;
