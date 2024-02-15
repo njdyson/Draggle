@@ -27,7 +27,7 @@ $(document).ready(function() {
         createPanel(panelHtml, panelId);
     });
 
-    //Add a note
+    // Event handler for adding a new note
     $('#addNote').click(function() {
         // Count the number of existing panels to generate a unique ID
         var noteCount = $('.note').length + 1;
@@ -97,16 +97,24 @@ $(document).ready(function() {
         }
     });
 
+    // Handle blur event for note body to render HTML content
+    $(document).on('blur', '.note-body[contenteditable="true"]', function() {
+        var htmlContent = $(this).html(); // Capture the HTML content
+        $(this).html(htmlContent); // Set the inner HTML to render it
+        // Optionally, you can remove the 'contenteditable' attribute or keep it depending on the desired behavior
+    });
 
     // Event handler for adding a new todo item
     $(document).on('keypress', '.todo-input', function(e) {
-        if (e.which == 13) { // Check if the Enter key is pressed
-            var todoText = $(this).val(); // Get the text entered in the input field
-            $(this).val(''); // Clear the input field
-            var listItem = `<li class='todo-item'><div class="drag-handle">&#x2630;</div><input type="checkbox" class="todo-checkbox"/><span class="editable">${todoText}</span></li>`; // HTML markup for the new todo item
-            $(this).siblings('.todo-list').append($(listItem)); // Append the new todo item to the todo list
+        if (e.which == 13) {
+            var timestamp = new Date().getTime(); // Get current timestamp
+            var todoText = $(this).val();
+            $(this).val('');
+            var listItem = `<li class='todo-item' id='todo-${timestamp}'><div class="drag-handle">&#x2630;</div><input type="checkbox" class="todo-checkbox"/><span class="editable">${todoText}</span><button class="edit-todo-btn" data-todo-id='todo-${timestamp}'>...</button></li>`;
+            $(this).siblings('.todo-list').append($(listItem));
         }
     });
+
 
     // Event handler for making todo item text editable
     $(document).on('click', '.editable', function() {
@@ -169,6 +177,55 @@ $(document).ready(function() {
         // Call function to make new cells editable
         makeCellsEditable();
 
+    });
+
+    function createOverlayPanel(todoId) {
+        // Instead of getting the panel by its ID, you'll first find the todo item
+        var todoItem = $('#' + todoId);
+        
+        // Assuming the text of the todo item is within a <span class="editable">, fetch it
+        var todoText = todoItem.find('.editable').text();
+        
+        // Create the overlay panel, now including the todo item's text as a title
+        var overlay = $(`<div class="overlay-panel">
+                            <h2 class="overlay-title">${todoText}</h2> <!-- Display todo text as title -->
+                            <button class="cancel-overlay">Cancel</button>
+                         </div>`);
+    
+        // Assuming your panel is the closest ancestor with a class like '.checklist' or similar
+        var panel = todoItem.closest('.panel, .checklist, .note');
+        
+        // Set the overlay's size and position based on the panel's dimensions
+        overlay.css({
+            width: panel.outerWidth(), // Include padding and border
+            height: panel.outerHeight(),
+            top: panel.position().top,
+            left: panel.position().left
+        });
+    
+        // Append the overlay to the canvas or a specific parent container
+        $('#canvas').append(overlay);
+    
+        // Hide the overlay on clicking cancel
+        overlay.find('.cancel-overlay').click(function() {
+            overlay.remove();
+        });
+    }
+    
+
+    $(document).on('click', '.edit-todo-btn', function() {
+        // Find the closest panel container of the clicked edit button
+        var panel = $(this).closest('.checklist'); // Adjust the class selectors as per your HTML structure
+        var panelId = panel.attr('id');
+    
+        // Call the function to create an overlay for the panel
+        createOverlayPanel(panelId);
+    });
+
+    $(document).on('click', '.edit-todo-btn', function() {
+        var todoId = $(this).attr('data-todo-id'); // Get the todo ID
+        
+        createOverlayPanel(todoId);
     });
     
 

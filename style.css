@@ -275,3 +275,51 @@ body, html {
     font-size: 22px;
     user-select: none; /* Prevent text selection */
 }
+
+.edit-todo-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+    color: #fff;
+    border: none; /* Remove the border */
+    background: none; /* Remove the background */
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    opacity: 0.6;
+}
+
+.edit-todo-btn:hover {
+    background-color: #424242;
+}
+
+.edit-todo-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0,123,255,.25);
+}
+
+.overlay-panel {
+    position: absolute;
+    background-color: rgb(76, 76, 76);
+    z-index: 100; /* Ensure it's above other content */
+    border-radius: 5px; /* Optional: Adds rounded corners */
+}
+
+.cancel-overlay {
+    display: flex;
+    outline: none;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 14px;
+    font-weight: 300;
+    border-radius: 8px;
+    padding: 10px 10px;
+    border: 1px solid #fff; /* Change border color to white */
+    transition: box-shadow 0.2s ease 0s, -ms-transform 0.1s ease 0s, -webkit-transform 0.1s ease 0s, transform 0.1s ease 0s;
+    background: transparent; /* Set background to transparent */
+    color: #fff; /* Set text color to white */
+    margin: 4px;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
