@@ -180,33 +180,27 @@ $(document).ready(function() {
     });
 
     function createOverlayPanel(todoId) {
-        // Instead of getting the panel by its ID, you'll first find the todo item
+        // Remove any existing overlay before creating a new one
+        $('.overlay-panel').remove();
+    
         var todoItem = $('#' + todoId);
-        
-        // Assuming the text of the todo item is within a <span class="editable">, fetch it
         var todoText = todoItem.find('.editable').text();
-        
-        // Create the overlay panel, now including the todo item's text as a title
+    
         var overlay = $(`<div class="overlay-panel">
-                            <h2 class="overlay-title">${todoText}</h2> <!-- Display todo text as title -->
+                            <h2 class="overlay-title">${todoText}</h2>
                             <button class="cancel-overlay">Cancel</button>
                          </div>`);
     
-        // Assuming your panel is the closest ancestor with a class like '.checklist' or similar
         var panel = todoItem.closest('.panel, .checklist, .note');
-        
-        // Set the overlay's size and position based on the panel's dimensions
         overlay.css({
-            width: panel.outerWidth(), // Include padding and border
+            width: panel.outerWidth(),
             height: panel.outerHeight(),
             top: panel.position().top,
             left: panel.position().left
         });
     
-        // Append the overlay to the canvas or a specific parent container
         $('#canvas').append(overlay);
     
-        // Hide the overlay on clicking cancel
         overlay.find('.cancel-overlay').click(function() {
             overlay.remove();
         });
@@ -223,8 +217,7 @@ $(document).ready(function() {
     });
 
     $(document).on('click', '.edit-todo-btn', function() {
-        var todoId = $(this).attr('data-todo-id'); // Get the todo ID
-        
+        var todoId = $(this).attr('data-todo-id');
         createOverlayPanel(todoId);
     });
     
