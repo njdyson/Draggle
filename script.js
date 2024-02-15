@@ -2,24 +2,12 @@
 $(document).ready(function() { 
    
     // Declare vaiables
-    var grid_size = 50; // Define the grid size
+    var grid_size = $(window).width() / 80; // Define the grid size as one 40th of the screen width
     var panel_width = 200; // Define the default panel width
     var panel_height = 200; // Define the default panel height
     var centerX = Math.round(($('#canvas').width() / 2 - panel_width / 2) / grid_size) * grid_size;// Calculate the center x position for the new panel
     var centerY = Math.round(($('#canvas').height() / 2 - panel_height / 2) / grid_size) * grid_size;// Calculate the center y position for the new panel
     
-    
-    // THIS DOESN'T WORK
-    $(document).ready(function() {
-        var lastLoadedBoard = localStorage.getItem('lastLoadedBoard'); // Get the filename from local storage
-        fetch(lastLoadedBoard + '.json')
-        .then(response => response.json())
-        .then(data => {
-            // Use this data to load the board
-            loadBoardFromData(data);
-        })
-        .catch(error => console.error('Error:', error));
-    }); 
 
     // Event handler for adding a new checklist
     $('#addChecklist').click(function() {
@@ -92,7 +80,7 @@ $(document).ready(function() {
         }).resizable({
             minHeight: 200, // Set the minimum height of the panel
             minWidth: 200, // Set the minimum width of the panel
-            grid: [grid_size, grid_size] // Set the grid size to snap to during resizing
+            grid: [grid_size, grid_size], // Set the grid size to snap to during resizing
         });
 
         // Make the todo items sortable
@@ -268,10 +256,26 @@ $(document).ready(function() {
                 location: { top: note.css('top'), left: note.css('left') },
                 size: { width: note.width(), height: note.height() },
                 title: note.find('.panel-title').val(),
-                content: note.find('.note-body').text()
+                content: note.find('.note-body').html()
             };
             boardData.items.push(item);
         });
+
+        // Iterate through all table panels
+        $('.table-panel').each(function() {
+            var panel = $(this);
+            var item = {
+                id: panel.attr('id'),
+                type: 'table',
+                location: { top: panel.css('top'), left: panel.css('left') },
+                size: { width: panel.width(), height: panel.height() },
+                title: panel.find('.panel-title').val(),
+                content: panel.find('table').html() // Capture the HTML content of the table
+            };
+            boardData.items.push(item);
+        });
+
+
     
         // Convert the boardData object to JSON
         return JSON.stringify(boardData, null, 2); // Pretty-print the JSON
@@ -331,6 +335,20 @@ $(document).ready(function() {
                         <div class="note-body" contenteditable="true">${item.content}</div>
                     </div>`;
             }
+            else if (item.type === 'table') {
+                var panelHtml = `
+                    <div class="table-panel" id="${item.id}" style="left:${item.location.left}; top:${item.location.top}; width: ${item.size.width}px; height: ${item.size.height}px;">
+                        <div class="handle"></div>
+                        <button class="delete-panel">X</button>
+                        <input type="text" class="panel-title" value="Table ${item.title}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
+                        <div class="table-container">
+                        <table class="editable-table">${item.content}</table>
+                        </div>
+                    <div class="add-row-symbol">+</div>
+                    <div class="add-column-symbol">+</div>
+                    </div>`;
+            }
+
             createPanel(panelHtml, item.id);
         });
 
