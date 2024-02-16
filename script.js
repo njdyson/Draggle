@@ -99,18 +99,19 @@ $(document).ready(function() {
     
         var todoItem = $('#' + todoId);
         var todoText = todoItem.find('.editable').text();
+        var description = todoItem.data('description');
     
         var overlay = $(`<div class="overlay-panel">
                             <div class="overlay-title" style='text-align:center;background-color:#202020;'>Edit Item</div>
                             <input type="text" class="item-line" value="${todoText}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
-                            <div class="note-body" contenteditable="true" style='padding:10px;opacity:0.6;'>Description</div>
+                            <div class="note-body" contenteditable="true" style='padding:10px;opacity:0.6;'>${description}</div>
                             <div class="overlay-nav">
                                 <button id='save-item' class="overlay-button">Save</button>
                                 <button id='cancel-item'class="overlay-button">Cancel</button>
                             </div>
                          </div>`);            
     
-        var panel = todoItem.closest('.panel, .checklist, .note');
+        var panel = todoItem.closest('.table-panel, .checklist, .note');
         overlay.css({
             width: panel.outerWidth(),
             height: panel.outerHeight(),
@@ -123,6 +124,26 @@ $(document).ready(function() {
         overlay.find('#cancel-item').click(function() {
             overlay.remove();
         });
+
+        // Event handler for saving the updated todo item
+        $('#canvas').off('click', '#save-item').on('click', '#save-item', function() {
+            var overlayPanel = $(this).closest('.overlay-panel');
+            var itemLine = overlayPanel.find('.item-line').val(); // Get updated item line
+            var description = overlayPanel.find('.note-body').text(); // Get updated description
+
+            // Find the original todo item and update its contents
+            var todoItem = $('#' + todoId);
+            todoItem.find('.editable').text(itemLine); // Update the todo item line
+            todoItem.data('description', description); // Store the description as part of the todo item's data
+
+            // Optionally, if there's a dedicated element to show descriptions, update it too
+            // todoItem.find('.description-element').text(description);
+
+            console.log("Updated todo item and description saved.");
+
+            // Remove overlay panel after saving
+            overlayPanel.remove();
+        });       
     }
 
     // Event handler for deleting a panel or note
@@ -145,12 +166,14 @@ $(document).ready(function() {
             var timestamp = new Date().getTime(); // Get current timestamp
             var todoText = $(this).val();
             $(this).val('');
-            var listItem = `<li class='todo-item' id='todo-${timestamp}'><div class="drag-handle">&#x2630;</div><input type="checkbox" class="todo-checkbox"/><span class="editable">${todoText}</span><button class="edit-todo-btn" data-todo-id='todo-${timestamp}'>...</button></li>`;
-            $(this).siblings('.todo-list').append($(listItem));
+            var listItem = $(`<li class='todo-item' id='todo-${timestamp}'><div class="drag-handle">&#x2630;</div><input type="checkbox" class="todo-checkbox"/><span class="editable">${todoText}</span><button class="edit-todo-btn" data-todo-id='todo-${timestamp}'>...</button></li>`);
+            listItem.data('description', 'Placeholder');
+            //$(this).siblings('.todo-list').append($(listItem));
+            $(this).siblings('.todo-list').append(listItem);
+
         }
     });
-
-
+    
     // Event handler for making todo item text editable
     $(document).on('click', '.editable', function() {
         var $editable = $(this);
@@ -278,6 +301,7 @@ $(document).ready(function() {
             });
         });
     }
+    
 
     // Initialize the editable title functionality
     makeTitleEditable();
