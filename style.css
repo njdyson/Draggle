@@ -306,6 +306,7 @@ body, html {
     flex-direction: column;
     overflow: hidden; /* Ensure content doesn't overflow */
     border-radius: 5px;
+    box-sizing: border-box;
 }
 
 .cancel-overlay {
