@@ -100,16 +100,24 @@ $(document).ready(function() {
         var todoItem = $('#' + todoId);
         var todoText = todoItem.find('.editable').text();
         var description = todoItem.data('description');
+        var currentTodoDate = todoItem.data('date'); // Get the current date
     
         var overlay = $(`<div class="overlay-panel">
-                            <div class="overlay-title" style='text-align:center;background-color:#202020;'>Edit Item</div>
-                            <input type="text" class="item-line" value="${todoText}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
+                    <div class="overlay-title" style='text-align:center;background-color:#202020;'>Edit Item</div>
+                        <div style="padding: 10px;">
+                            <label for="item-line" style='color: #ffffff;'>Item</label><br>
+                            <input type="text" id="item-line" class="item-line" value="${todoText}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
+                            <label for="todo-date" style='color: #ffffff;'>Due Date</label><br>
+                            <input type="text" id="todo-date" class="date-picker" placeholder="DD-MM-YYYY" /><br>
+                            <label for="note-body" style='color: #ffffff;'>Description</label>
                             <div class="note-body" contenteditable="true" style='padding:10px;opacity:0.6;'>${description}</div>
                             <div class="overlay-nav">
                                 <button id='save-item' class="overlay-button">Save</button>
-                                <button id='cancel-item'class="overlay-button">Cancel</button>
+                                <button id='cancel-item' class="overlay-button">Cancel</button>
                             </div>
-                         </div>`);            
+                    </div>
+                </div>`);
+                         
     
         var panel = todoItem.closest('.table-panel, .checklist, .note');
         overlay.css({
@@ -120,6 +128,22 @@ $(document).ready(function() {
         });
     
         $('#canvas').append(overlay);
+
+        // Then, initialize the datepicker
+        overlay.find('.date-picker').datepicker({
+            dateFormat: 'dd-mm-yy',
+            onSelect: function(dateText) {
+                var todoItem = $('#' + todoId);
+                todoItem.data('date', dateText); // Store the selected date
+            }
+        });
+
+
+        if(currentTodoDate) {
+            //var formattedDate = $.datepicker.formatDate('dd-mm-yy', new Date(currentTodoDate));
+            overlay.find('.date-picker').datepicker('setDate', formattedDate);
+        }
+          
     
         overlay.find('#cancel-item').click(function() {
             overlay.remove();
@@ -130,16 +154,13 @@ $(document).ready(function() {
             var overlayPanel = $(this).closest('.overlay-panel');
             var itemLine = overlayPanel.find('.item-line').val(); // Get updated item line
             var description = overlayPanel.find('.note-body').text(); // Get updated description
+            var todoDate = overlayPanel.find('.date-picker').val(); // Get updated due date
 
             // Find the original todo item and update its contents
             var todoItem = $('#' + todoId);
             todoItem.find('.editable').text(itemLine); // Update the todo item line
             todoItem.data('description', description); // Store the description as part of the todo item's data
-
-            // Optionally, if there's a dedicated element to show descriptions, update it too
-            // todoItem.find('.description-element').text(description);
-
-            console.log("Updated todo item and description saved.");
+            todoItem.data('date', todoDate); // Store the due date as part of the todo item's data
 
             // Remove overlay panel after saving
             overlayPanel.remove();
@@ -167,13 +188,13 @@ $(document).ready(function() {
             var todoText = $(this).val();
             $(this).val('');
             var listItem = $(`<li class='todo-item' id='todo-${timestamp}'><div class="drag-handle">&#x2630;</div><input type="checkbox" class="todo-checkbox"/><span class="editable">${todoText}</span><button class="edit-todo-btn" data-todo-id='todo-${timestamp}'>...</button></li>`);
-            listItem.data('description', 'Placeholder');
-            //$(this).siblings('.todo-list').append($(listItem));
+            listItem.data('description', ''); // Store the description as part of the todo item's data
+            listItem.data('date');
             $(this).siblings('.todo-list').append(listItem);
 
         }
     });
-    
+
     // Event handler for making todo item text editable
     $(document).on('click', '.editable', function() {
         var $editable = $(this);

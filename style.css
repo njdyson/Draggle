@@ -364,3 +364,50 @@ body, html {
     color: #fff; /* Set text color to white */
     margin: 4px;
 }
+
+.date-picker {
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 200;
+    border-style: none; 
+    width: 25%; /* Adjust width as needed */
+    background-color: #303030; /* Match overlay background */
+    color: #ffffff; /* Text color */
+}
+
+.date-picker:focus {
+    outline: none; /* Remove focus outline */
+    border-style: none; 
+}
+
+/* Style jQuery UI DatePicker to match */
+.ui-datepicker {
+    background-color: #404040; /* Dark background for the datepicker */
+    border: 1px solid #303030; /* Border color to match overlay */
+    color: #ffffff; /* Text color */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Consistent shadow */
+}
+
+.ui-datepicker a {
+    color: #ffffff; /* Links color */
+}
+
+.ui-datepicker-header {
+    background-color: #303030; /* Header background to match overlay title */
+    color: #ffffff; /* Header text color */
+    border-bottom: 1px solid #404040; /* Border to separate header */
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    background: #303030; /* Match button backgrounds */
+    border: 1px solid #fff; /* Button borders */
+    color: #fff; /* Button text color */
+}
+
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover,
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+    background: #505050; /* Hover and active state background */
+    border: 1px solid #fff; /* Hover and active state border */
+    color: #fff; /* Text color consistent with overlay buttons */
+}
+
