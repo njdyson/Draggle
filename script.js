@@ -247,6 +247,20 @@ $(document).ready(function() {
         saveTextFile();
     });
 
+    // Event handler for clearing the board when the newBoard button is pressed
+    $('#newBoard').click(function() {
+        // Clear existing panels and notes
+        $('.checklist, .note').remove();
+
+        // Reset panel count if necessary
+        var checklistCount = 0;
+        var noteCount = 0;
+        var tableCount = 0;
+
+        // Set the board title
+        $("#canvasTitle").text("New Board");
+    });
+
     function makeTitleEditable() {
         $('#canvasTitle').one('click', function() {
             var currentTitle = $(this).text();
@@ -365,6 +379,7 @@ $(document).ready(function() {
         // Reset panel count if necessary
         var checklistCount = 0;
         var noteCount = 0;
+        var tableCount = 0;
 
         // Set the board title
         $("#canvasTitle").text(boardData.boardTitle);
