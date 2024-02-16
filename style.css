@@ -309,23 +309,45 @@ body, html {
     box-sizing: border-box;
 }
 
-.cancel-overlay {
-    display: flex;
+.item-title {
+    font-size: 16px;
+    font-weight: 300;
+    border-style: none;
+    padding-bottom: 10px;
+    width: 96%;
+    background-color: #303030;
+    color: #ffffff;
+}
+
+.item-title:focus {
+    outline: none; /* Remove the default focus outline */
+    border: none; /* Remove the border when in focus */
+}
+
+/* Place the navbar at the top of the page, and make it stick */
+.overlay-nav {
+    background-color: #303030;
+    overflow: hidden;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    display: flex; /* Add this line to enable flexbox */
+    justify-content: center; /* Center the buttons horizontally */
+    opacity: 0.3;
+    flex-direction: row;
+}
+
+.overlay-button {
     outline: none;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
     line-height: 14px;
     font-weight: 300;
     border-radius: 8px;
-    padding: 8px 8px;
+    padding: 10px 10px;
     border: 1px solid #fff; /* Change border color to white */
     transition: box-shadow 0.2s ease 0s, -ms-transform 0.1s ease 0s, -webkit-transform 0.1s ease 0s, transform 0.1s ease 0s;
     background: transparent; /* Set background to transparent */
     color: #fff; /* Set text color to white */
     margin: 4px;
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0.8;
 }
