@@ -2,11 +2,14 @@
 $(document).ready(function() { 
    
     // Declare vaiables
-    var grid_size = $(window).width() / 80; // Define the grid size as one 40th of the screen width
-    var panel_width = 200; // Define the default panel width
-    var panel_height = 200; // Define the default panel height
-    var centerX = Math.round(($('#canvas').width() / 2 - panel_width / 2) / grid_size) * grid_size;// Calculate the center x position for the new panel
-    var centerY = Math.round(($('#canvas').height() / 2 - panel_height / 2) / grid_size) * grid_size;// Calculate the center y position for the new panel
+    var grid_size_x = $(window).width() / 80; // Define the x grid size as one 40th of the screen width
+    var grid_size_y = $(window).height() / 40; // Define the y grid size as one 40th of the screen height
+    var panel_width = $(window).width() / 8; // Define the default panel width
+    var panel_height = $(window).height() / 4; // Define the default panel height
+    //var centerX = Math.round(($('#canvas').width() / 2 - panel_width / 2) / grid_size) * grid_size;// Calculate the center x position for the new panel
+    //var centerY = Math.round(($('#canvas').height() / 2 - panel_height / 2) / grid_size) * grid_size;// Calculate the center y position for the new panel
+    var centerX = 0;
+    var centerY = 0;
     
 
     // Event handler for adding a new checklist
@@ -75,12 +78,12 @@ $(document).ready(function() {
         $('#' + panelId).draggable({
             handle: ".handle", // Specify the handle for dragging
             cancel: ".panel-title, .editable", // Specify elements to exclude from dragging
-            grid: [grid_size, grid_size], // Set the grid size to snap to during dragging
+            grid: [grid_size_x, grid_size_y], // Set the grid size to snap to during dragging
             containment: "#canvas" // Specify the containment element
         }).resizable({
             minHeight: 200, // Set the minimum height of the panel
             minWidth: 200, // Set the minimum width of the panel
-            grid: [grid_size, grid_size], // Set the grid size to snap to during resizing
+            grid: [grid_size_x, grid_size_y], // Set the grid size to snap to during resizing
         });
 
         // Make the todo items sortable
@@ -88,7 +91,39 @@ $(document).ready(function() {
             handle: ".drag-handle", // Specify the handle for sorting
             placeholder: "sortable-placeholder" // Specify the placeholder for sorting
         }).disableSelection(); // Disable text selection while sorting
-    }    
+    }
+    
+    function createOverlayPanel(todoId) {
+        // Remove any existing overlay before creating a new one
+        $('.overlay-panel').remove();
+    
+        var todoItem = $('#' + todoId);
+        var todoText = todoItem.find('.editable').text();
+    
+        var overlay = $(`<div class="overlay-panel">
+                            <div class="overlay-title" style='text-align:center;background-color:#202020;'>Edit Item</div>
+                            <input type="text" class="item-line" value="${todoText}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
+                            <div class="note-body" contenteditable="true" style='padding:10px;opacity:0.6;'>Description</div>
+                            <div class="overlay-nav">
+                                <button id='save-item' class="overlay-button">Save</button>
+                                <button id='cancel-item'class="overlay-button">Cancel</button>
+                            </div>
+                         </div>`);            
+    
+        var panel = todoItem.closest('.panel, .checklist, .note');
+        overlay.css({
+            width: panel.outerWidth(),
+            height: panel.outerHeight(),
+            top: panel.position().top,
+            left: panel.position().left
+        });
+    
+        $('#canvas').append(overlay);
+    
+        overlay.find('#cancel-item').click(function() {
+            overlay.remove();
+        });
+    }
 
     // Event handler for deleting a panel or note
     $(document).on('click', '.delete-panel', function() {
@@ -178,38 +213,6 @@ $(document).ready(function() {
         makeCellsEditable();
 
     });
-
-    function createOverlayPanel(todoId) {
-        // Remove any existing overlay before creating a new one
-        $('.overlay-panel').remove();
-    
-        var todoItem = $('#' + todoId);
-        var todoText = todoItem.find('.editable').text();
-    
-        var overlay = $(`<div class="overlay-panel">
-                            <div class="panel-title" style='text-align:center;'>Item</div>
-                            <input type="text" class="item-title" value="${todoText}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
-                            <div class="note-body" contenteditable="true">Description</div>
-                            <div class="overlay-nav">
-                                <button class="overlay-button">Save</button>
-                                <button class="overlay-button">Cancel</button>
-                            </div>
-                         </div>`);            
-    
-        var panel = todoItem.closest('.panel, .checklist, .note');
-        overlay.css({
-            width: panel.outerWidth(),
-            height: panel.outerHeight(),
-            top: panel.position().top,
-            left: panel.position().left
-        });
-    
-        $('#canvas').append(overlay);
-    
-        overlay.find('.cancel-overlay').click(function() {
-            overlay.remove();
-        });
-    }
     
 
     $(document).on('click', '.edit-todo-btn', function() {
@@ -329,8 +332,6 @@ $(document).ready(function() {
             };
             boardData.items.push(item);
         });
-
-
     
         // Convert the boardData object to JSON
         return JSON.stringify(boardData, null, 2); // Pretty-print the JSON

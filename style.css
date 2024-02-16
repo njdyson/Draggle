@@ -191,6 +191,7 @@ body, html {
     font-size: 28px;
     background-color: #383838;
     width: 100%;
+    padding: 8px;
 }
 
 .title-input {
@@ -297,7 +298,6 @@ body, html {
 }
 
 .overlay-panel {
-    padding: 10px;
     position: absolute;
     border: none;
     background-color: #303030;
@@ -309,7 +309,18 @@ body, html {
     box-sizing: border-box;
 }
 
-.item-title {
+.overlay-title {
+    font-size: 20px;
+    font-weight: 500;
+    border-style: none;
+    width: 100%;
+    background-color: #404040;
+    color: #ffffff;
+    padding: 10px;
+}
+
+.item-line {
+    padding: 10px;
     font-size: 16px;
     font-weight: 300;
     border-style: none;
@@ -319,7 +330,7 @@ body, html {
     color: #ffffff;
 }
 
-.item-title:focus {
+.item-line:focus {
     outline: none; /* Remove the default focus outline */
     border: none; /* Remove the border when in focus */
 }
@@ -335,6 +346,7 @@ body, html {
     justify-content: center; /* Center the buttons horizontally */
     opacity: 0.3;
     flex-direction: row;
+    padding:10px;
 }
 
 .overlay-button {
