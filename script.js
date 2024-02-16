@@ -187,9 +187,11 @@ $(document).ready(function() {
         var todoText = todoItem.find('.editable').text();
     
         var overlay = $(`<div class="overlay-panel">
-                            <h2 class="panel-title">${todoText}</h2>
+                            <div class="handle"></div>
+                            <input type="text" class="panel-title" value="Item: ${todoText}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
+                            <div class="note-body" contenteditable="true"></div>
                             <button class="cancel-overlay">Cancel</button>
-                         </div>`);
+                         </div>`);            
     
         var panel = todoItem.closest('.panel, .checklist, .note');
         overlay.css({
