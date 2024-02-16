@@ -187,7 +187,7 @@ $(document).ready(function() {
         var todoText = todoItem.find('.editable').text();
     
         var overlay = $(`<div class="overlay-panel">
-                            <h2 class="overlay-title">${todoText}</h2>
+                            <h2 class="panel-title">${todoText}</h2>
                             <button class="cancel-overlay">Cancel</button>
                          </div>`);
     
