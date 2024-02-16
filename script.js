@@ -140,7 +140,12 @@ $(document).ready(function() {
 
 
         if(currentTodoDate) {
-            //var formattedDate = $.datepicker.formatDate('dd-mm-yy', new Date(currentTodoDate));
+            // Assuming currentTodoDate is in 'DD-MM-YYYY' format
+            var parts = currentTodoDate.split('-');
+            // Note: JavaScript months are 0-based, so subtract 1 from the month part
+            var formattedDate = new Date(parts[2], parts[1] - 1, parts[0]);
+        
+            // Now set the date on the datepicker
             overlay.find('.date-picker').datepicker('setDate', formattedDate);
         }
           
@@ -353,12 +358,23 @@ $(document).ready(function() {
         // Iterate through all checklists
         $('.checklist').each(function() {
             var panel = $(this);
+            var checklistItems = [];
+            panel.find('.todo-item').each(function() {
+                var todoItem = $(this);
+                checklistItems.push({
+                    text: todoItem.find('.editable').text(),
+                    description: todoItem.data('description'),
+                    date: todoItem.data('date')
+                });
+            });
+    
             var item = {
                 id: panel.attr('id'),
                 type: 'checklist',
                 location: { top: panel.css('top'), left: panel.css('left') },
                 size: { width: panel.width(), height: panel.height() },
                 title: panel.find('.panel-title').val(),
+                todos: checklistItems,
                 content: panel.find('.todo-list').html() // Capture the HTML content of the todo-list
             };
             boardData.items.push(item);
