@@ -231,7 +231,7 @@ $(document).ready(function() {
     // Event handler for deleting a panel or note
     $(document).on('click', '.delete-panel', function() {
         if (confirm('Are you sure you want to delete this panel/note?')) {
-            $(this).closest('.panel, .note').remove();
+            $(this).closest('.checklist, .note, .table-panel, .process-panel').remove();
         }
     });
 
