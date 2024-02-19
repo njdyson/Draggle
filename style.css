@@ -6,7 +6,7 @@ body, html {
     background-image: url("background.jpg");
     background-size: cover;
     overflow: hidden; /* Prevent scrolling beyond viewport */
-    font-size: 13px;
+    font-size: 14px;
 }
 
 #canvas {
@@ -16,7 +16,7 @@ body, html {
     overflow: hidden;
 }
 
-.checklist, .note, .table-panel {
+.checklist, .note, .table-panel, .process-panel {
     width: 400px; /* Initial and minimum size */
     height: 300px; /* Initial and minimum size */
     min-width: 200px;
@@ -87,6 +87,12 @@ body, html {
     color: #ffffff;
 }
 
+.todo-content {
+    display: flex;
+    align-items: center;
+    width: 100%; /* Ensure it spans the full width of its parent */
+}
+
 .todo-input {
     border-style: none;
     width: 96%;
@@ -120,11 +126,11 @@ body, html {
 .delete-panel {
     position: absolute;
     top: 5px;
-    right: 2px;
+    right: 3px;
     background: none;
     color: #9c9c9c;
     border: none;
-    font-size: 10px;
+    font-size: 12px;
     cursor: pointer;
     opacity: 0.5;
     display: flex;
@@ -411,4 +417,50 @@ body, html {
     color: #fff; /* Text color consistent with overlay buttons */
 }
 
+.process-panel .process-list {
+    list-style-position: inside;
+    margin: 0;
+    padding-left: 20px; /* Adjust based on your design preference */
+    color: #cecece; /* Matching the color scheme */
+}
 
+.process-panel .process-list li {
+    padding: 5px 0; /* Provide some padding for readability */
+    border-bottom: 1px solid #404040; /* Optional: adds a subtle separator */
+    color: #ffffff; /* Ensure text color matches the theme */
+}
+
+/* If you're using a drag handle for each process list item */
+.process-panel .process-list .drag-handle {
+    margin-right: 10px; /* Adjust based on your design */
+    cursor: grab;
+    color: #cecece; /* Ensure visibility against the panel background */
+}
+
+.process-panel .process-input {
+    margin-top: 10px;
+    padding: 8px;
+    background-color: #404040; /* Slightly different to stand out */
+    color: #ffffff;
+    border: 1px solid #555; /* Subtle border */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.process-panel .process-input:focus {
+    outline: none; /* Remove default focus outline */
+    border-color: #757575; /* Highlight input box on focus */
+}
+
+.process-panel .delete-panel:hover,
+.process-panel .edit-todo-btn:hover {
+    opacity: 1; /* Increase visibility on hover */
+    color: #ffffff;
+}
+
+/* Enhance the visual feedback for draggable items */
+.process-panel .drag-handle:hover {
+    opacity: 1; /* Full opacity to indicate draggability */
+}
+
+
+  

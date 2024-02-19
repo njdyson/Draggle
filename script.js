@@ -90,6 +90,22 @@ $(document).ready(function() {
         positionPlusSymbols(panelId);
     });
 
+    $('#addProcess').click(function() {
+        var processCount = $('.process-panel').length + 1;
+        var panelId = 'process-' + processCount;
+    
+        var panelHtml = `<div class="process-panel" id="${panelId}">
+            <div class="handle"></div>
+            <button class="delete-panel">X</button>
+            <input type="text" class="panel-title" value="Process ${processCount}">
+            <ol class="process-list"></ol>
+            <input type="text" class="process-input" placeholder="Add new step"/>
+        </div>`;
+    
+        createPanel(panelHtml, panelId);
+    });
+    
+
     function createPanel(panelHtml, panelId) {
         // Append the new panel to the canvas
         $('#canvas').append(panelHtml);
@@ -110,7 +126,28 @@ $(document).ready(function() {
             handle: ".drag-handle", // Specify the handle for sorting
             placeholder: "sortable-placeholder" // Specify the placeholder for sorting
         }).disableSelection(); // Disable text selection while sorting
+
+        // Check if this is a process panel and make its list sortable
+        if ($('#' + panelId).hasClass('process-panel')) {
+            $('#' + panelId + ' .process-list').sortable({
+                placeholder: "sortable-placeholder",
+                update: function(event, ui) {
+                    updateProcessNumbers(panelId);
+                }
+            }).disableSelection();
+        }
     }
+
+
+    $(document).on('keypress', '.process-input', function(e) {
+        if (e.which == 13) { // Enter key pressed
+            var stepText = $(this).val();
+            $(this).val(''); // Clear the input field after adding the step
+            var listItem = $(`<li><span class="editable">${stepText}</span></li>`); // Remove the <span class="step-number"></span>
+            $(this).siblings('.process-list').append(listItem);
+        }
+    });
+    
     
     function createOverlayPanel(todoId) {
         // Remove any existing overlay before creating a new one
