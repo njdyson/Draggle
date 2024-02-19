@@ -36,15 +36,34 @@ $(document).ready(function() {
         var noteCount = $('.note').length + 1;
         var panelId = 'note-' + noteCount;
 
-        // HTML markup for the new panel
+        var editorId = 'editor-' + noteCount; // Generate a unique ID for each editor instance
         var panelHtml = `<div class="note" id="${panelId}" style="left:${centerX}px; top:${centerY}px;">
-            <div class="handle"></div> <!-- Handle for dragging the panel -->
-            <button class="delete-panel">X</button> <!-- Delete button -->
+            <div class="handle"></div>
+            <button class="delete-panel">X</button>
             <input type="text" class="panel-title" value="Note ${noteCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
-            <div class="note-body" contenteditable="true"></div> <!-- Text area for the panel body -->
+            <div id="${editorId}"></div> <!-- Unique ID for the Quill editor container -->
         </div>`;
 
         createPanel(panelHtml, panelId);
+
+        const toolbarOptions = [['bold', 'italic', 'underline', 'strike'], 
+        ['link', 'image']];
+
+        var quill = new Quill(`#${editorId}`, { 
+            modules: {
+                toolbar: toolbarOptions,
+              },
+              placeholder: 'Compose an epic...',
+              theme: 'snow'
+        });
+        
+        // Get the Quill editor container
+        //var quillContainer = document.querySelector(`#${editorId}`);
+        // Prevent the default context menu from showing on right-click within the Quill editor
+       // quillContainer.addEventListener('contextmenu', function(event) {
+           // event.preventDefault();
+            // You can trigger your custom context menu here, if you have one
+        //});
     });
     
     $('#addTable').click(function() {
