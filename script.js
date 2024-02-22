@@ -30,20 +30,6 @@ $(document).ready(function() {
         createPanel(panelHtml, panelId);
     });
 
-    // Event handler for adding a new todo item
-    $(document).on('keypress', '.todo-input', function(e) {
-        if (e.which == 13) {
-            var timestamp = new Date().getTime(); // Get current timestamp
-            var todoText = $(this).val();
-            $(this).val('');
-            var listItem = $(`<li class='todo-item' id='todo-${timestamp}'><input type="checkbox" class="todo-checkbox"/><span class="editable">${todoText}</span><button class="edit-todo-btn" data-todo-id='todo-${timestamp}'>...</button></li>`);//<div class="drag-handle">&#x2630;</div>
-            listItem.data('description', ''); // Store the description as part of the todo item's data
-            listItem.data('date');
-            $(this).siblings('.todo-list').append(listItem);
-
-        }
-    });
-
     // Event handler for adding a new note
     $('#addNote').click(function() {
         // Count the number of existing panels to generate a unique ID
@@ -108,6 +94,7 @@ $(document).ready(function() {
         </div>`;
     
         createPanel(panelHtml, panelId);
+
     });
     
 
@@ -147,12 +134,32 @@ $(document).ready(function() {
         }
     }
 
-    // Function to update the process numbers when a step is added, removed, or reordered
+     // Event handler for adding a new todo item
+     $(document).on('keypress', '.todo-input', function(e) {
+        if (e.which == 13) {
+            var timestamp = new Date().getTime(); // Get current timestamp
+            var todoText = $(this).val();
+            $(this).val('');
+            var listItem = $(`<li class='todo-item' id='todo-${timestamp}'><input type="checkbox" class="todo-checkbox"/><span class="editable">${todoText}</span><button class="edit-todo-btn" data-todo-id='todo-${timestamp}'>...</button></li>`);
+            listItem.data('description', ''); // Store the description as part of the todo item's data
+            listItem.data('date');
+            $(this).siblings('.todo-list').append(listItem);
+
+        }
+    });
+    
+    // Function to add a new step to the process panel
     $(document).on('keypress', '.process-input', function(e) {
         if (e.which == 13) { // Enter key pressed
+            var timestamp = new Date().getTime(); // Get current timestamp
             var stepText = $(this).val();
             $(this).val(''); // Clear the input field after adding the step
-            var listItem = $(`<li><span class="editable">${stepText}</span></li>`); // Remove the <span class="step-number"></span>
+            var listItem = $(`<li>
+                <span class="process-item" id='process-${timestamp}'>${stepText}</span>
+                <button class="edit-process-btn" data-process-id='process-${timestamp}'>...</button>
+                <div class="process-description"></div> <!-- Placeholder for description -->
+                </li>`); 
+            listItem.data('description', ''); // Store the description as part of the todo item's data
             $(this).siblings('.process-list').append(listItem);
         }
     });
@@ -237,6 +244,77 @@ $(document).ready(function() {
         });       
     }
 
+   // Function to add a new step to the process panel
+   $(document).on('keypress', '.process-input', function(e) {
+    if (e.which == 13) { // Enter key pressed
+        var timestamp = new Date().getTime(); // Get current timestamp
+        var stepText = $(this).val();
+        $(this).val(''); // Clear the input field after adding the step
+        var listItem = $(`<li>
+            <span class="process-item" id='process-${timestamp}'>${stepText}</span>
+            <button class="edit-process-btn" data-process-id='process-${timestamp}'>...</button>
+            <div class="process-description"></div> <!-- Placeholder for description -->
+            </li>`); 
+        listItem.data('description', ''); // Store the description as part of the todo item's data
+        $(this).siblings('.process-list').append(listItem);
+        }
+    });
+
+    // Function to create an overlay for the process panel to edit details
+    function createProcessOverlayPanel(processId) {
+        // Remove any existing overlay before creating a new one
+        $('.overlay-panel').remove();
+
+        var processItem = $('#' + processId);
+        var processText = processItem.find('.process-item').text();
+        var description = processItem.data('description'); // Assuming you store additional data like description
+
+        var overlayHtml = `<div class="overlay-panel">
+            <div class="overlay-title" style='text-align:center;background-color:#202020;'>Edit Process</div>
+            <div style="padding: 10px;">
+                <label for="process-title" style='color: #ffffff;'>Item</label><br>
+                <input type="text" id="process-title" class="item-line" value="${processText}" onfocus="this.select()">
+                <label for="process-description" style='color: #ffffff;'>Description</label>
+                <textarea id="process-description" class="note-body" style='padding:10px;opacity:0.6;'>${description}</textarea>
+                <div class="overlay-nav">
+                    <button id='save-process' class="overlay-button">Save</button>
+                    <button id='cancel-process' class="overlay-button">Cancel</button>
+                </div>
+            </div>
+        </div>`;
+
+        var panel = processItem.closest('.process-panel');
+        var overlay = $(overlayHtml).css({
+            width: panel.outerWidth(),
+            height: panel.outerHeight(),
+            top: panel.position().top,
+            left: panel.position().left
+        });
+
+        $('#canvas').append(overlay);
+
+        // Event handler for canceling the overlay
+        overlay.find('#cancel-process').click(function() {
+            overlay.remove();
+        });
+
+        // Updated event handler for saving the updated process item
+        $('#canvas').off('click', '#save-process').on('click', '#save-process', function() {
+            var overlayPanel = $(this).closest('.overlay-panel');
+            var title = overlayPanel.find('#process-title').val(); // Get updated title
+            var description = overlayPanel.find('#process-description').val(); // Get updated description
+
+            var processItem = $('#' + processId); // Assuming processId is the ID of the <li>
+            processItem.find('.process-item').val(title); // Update the text/title of the process item
+            processItem.data('description', description); // Store the updated description
+            processItem.find('.process-description').val(description); // Update the description display
+
+            overlayPanel.remove(); // Remove overlay panel after saving
+        });
+   
+    }
+
+
     // Event handler for deleting a panel or note
     $(document).on('click', '.delete-panel', function() {
         if (confirm('Are you sure you want to delete this panel/note?')) {
@@ -306,22 +384,16 @@ $(document).ready(function() {
         makeCellsEditable();
 
     });
-    
-
-    $(document).on('click', '.edit-todo-btn', function() {
-        // Find the closest panel container of the clicked edit button
-        var panel = $(this).closest('.checklist'); // Adjust the class selectors as per your HTML structure
-        var panelId = panel.attr('id');
-    
-        // Call the function to create an overlay for the panel
-        createOverlayPanel(panelId);
-    });
 
     $(document).on('click', '.edit-todo-btn', function() {
         var todoId = $(this).attr('data-todo-id');
         createOverlayPanel(todoId);
     });
     
+    $(document).on('click', '.edit-process-btn', function() {
+        var processId = $(this).attr('data-process-id');
+        createProcessOverlayPanel(processId);
+    });
 
     // Event handler for updating todo item text
     $(document).on('blur', '.editable[contenteditable="true"]', function() {
