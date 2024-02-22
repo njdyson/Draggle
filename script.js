@@ -40,20 +40,19 @@ $(document).ready(function() {
         var panelHtml = `<div class="note" id="${panelId}" style="left:${centerX}px; top:${centerY}px;">
             <div class="handle"></div>
             <button class="delete-panel">X</button>
-            <input type="text" class="panel-title" value="Note ${noteCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
             <div id="${editorId}"></div> <!-- Unique ID for the Quill editor container -->
         </div>`;
 
         createPanel(panelHtml, panelId);
 
-        const toolbarOptions = [['bold', 'italic', 'underline', 'strike'], 
-        ['link', 'image']];
+        const toolbarOptions = [[{ 'header': 1 }, { 'header': 2 },'bold', 'italic', 'underline', 'strike',{ 'color': [] }], 
+        [{ 'list': 'bullet' }, { 'list': 'ordered'}],['code-block', 'link']];
 
         var quill = new Quill(`#${editorId}`, { 
             modules: {
                 toolbar: toolbarOptions,
               },
-              placeholder: 'Compose an epic...',
+              placeholder: 'Note...',
               theme: 'snow'
         });
         
