@@ -30,6 +30,20 @@ $(document).ready(function() {
         createPanel(panelHtml, panelId);
     });
 
+    // Event handler for adding a new todo item
+    $(document).on('keypress', '.todo-input', function(e) {
+        if (e.which == 13) {
+            var timestamp = new Date().getTime(); // Get current timestamp
+            var todoText = $(this).val();
+            $(this).val('');
+            var listItem = $(`<li class='todo-item' id='todo-${timestamp}'><input type="checkbox" class="todo-checkbox"/><span class="editable">${todoText}</span><button class="edit-todo-btn" data-todo-id='todo-${timestamp}'>...</button></li>`);//<div class="drag-handle">&#x2630;</div>
+            listItem.data('description', ''); // Store the description as part of the todo item's data
+            listItem.data('date');
+            $(this).siblings('.todo-list').append(listItem);
+
+        }
+    });
+
     // Event handler for adding a new note
     $('#addNote').click(function() {
         // Count the number of existing panels to generate a unique ID
@@ -52,17 +66,9 @@ $(document).ready(function() {
             modules: {
                 toolbar: toolbarOptions,
               },
-              placeholder: 'Note...',
+              placeholder: 'Content...',
               theme: 'snow'
         });
-        
-        // Get the Quill editor container
-        //var quillContainer = document.querySelector(`#${editorId}`);
-        // Prevent the default context menu from showing on right-click within the Quill editor
-       // quillContainer.addEventListener('contextmenu', function(event) {
-           // event.preventDefault();
-            // You can trigger your custom context menu here, if you have one
-        //});
     });
     
     $('#addTable').click(function() {
@@ -93,7 +99,7 @@ $(document).ready(function() {
         var processCount = $('.process-panel').length + 1;
         var panelId = 'process-' + processCount;
     
-        var panelHtml = `<div class="process-panel" id="${panelId}">
+        var panelHtml = `<div class="process-panel" id="${panelId}" style="left:${centerX}px; top:${centerY}px;">
             <div class="handle"></div>
             <button class="delete-panel">X</button>
             <input type="text" class="panel-title" value="Process ${processCount}">
@@ -120,12 +126,6 @@ $(document).ready(function() {
             grid: [grid_size_x, grid_size_y], // Set the grid size to snap to during resizing
         });
 
-        // Make the todo items sortable
-        $('.todo-list').sortable({
-            handle: ".drag-handle", // Specify the handle for sorting
-            placeholder: "sortable-placeholder" // Specify the placeholder for sorting
-        }).disableSelection(); // Disable text selection while sorting
-
         // Check if this is a process panel and make its list sortable
         if ($('#' + panelId).hasClass('process-panel')) {
             $('#' + panelId + ' .process-list').sortable({
@@ -135,9 +135,19 @@ $(document).ready(function() {
                 }
             }).disableSelection();
         }
+
+        // Check if this is a checklist panel and make its list sortable
+        if ($('#' + panelId).hasClass('checklist')) {
+            $('#' + panelId + ' .todo-list').sortable({
+                placeholder: "sortable-placeholder",
+                update: function(event, ui) {
+                    updateProcessNumbers(panelId);
+                }
+            }).disableSelection();
+        }
     }
 
-
+    // Function to update the process numbers when a step is added, removed, or reordered
     $(document).on('keypress', '.process-input', function(e) {
         if (e.which == 13) { // Enter key pressed
             var stepText = $(this).val();
@@ -147,7 +157,7 @@ $(document).ready(function() {
         }
     });
     
-    
+    // Create overlay to checklist to edit details
     function createOverlayPanel(todoId) {
         // Remove any existing overlay before creating a new one
         $('.overlay-panel').remove();
@@ -193,7 +203,7 @@ $(document).ready(function() {
             }
         });
 
-
+        // Set the date on the datepicker if it exists
         if(currentTodoDate) {
             // Assuming currentTodoDate is in 'DD-MM-YYYY' format
             var parts = currentTodoDate.split('-');
@@ -204,7 +214,7 @@ $(document).ready(function() {
             overlay.find('.date-picker').datepicker('setDate', formattedDate);
         }
           
-    
+        // Event handler for canceling the overlay
         overlay.find('#cancel-item').click(function() {
             overlay.remove();
         });
@@ -231,27 +241,6 @@ $(document).ready(function() {
     $(document).on('click', '.delete-panel', function() {
         if (confirm('Are you sure you want to delete this panel/note?')) {
             $(this).closest('.checklist, .note, .table-panel, .process-panel').remove();
-        }
-    });
-
-    // Handle blur event for note body to render HTML content
-    $(document).on('blur', '.note-body[contenteditable="true"]', function() {
-        var htmlContent = $(this).html(); // Capture the HTML content
-        $(this).html(htmlContent); // Set the inner HTML to render it
-        // Optionally, you can remove the 'contenteditable' attribute or keep it depending on the desired behavior
-    });
-
-    // Event handler for adding a new todo item
-    $(document).on('keypress', '.todo-input', function(e) {
-        if (e.which == 13) {
-            var timestamp = new Date().getTime(); // Get current timestamp
-            var todoText = $(this).val();
-            $(this).val('');
-            var listItem = $(`<li class='todo-item' id='todo-${timestamp}'><div class="drag-handle">&#x2630;</div><input type="checkbox" class="todo-checkbox"/><span class="editable">${todoText}</span><button class="edit-todo-btn" data-todo-id='todo-${timestamp}'>...</button></li>`);
-            listItem.data('description', ''); // Store the description as part of the todo item's data
-            listItem.data('date');
-            $(this).siblings('.todo-list').append(listItem);
-
         }
     });
 

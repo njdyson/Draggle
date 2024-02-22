@@ -179,10 +179,11 @@ body, html {
     flex-direction: row;
     z-index: 1000;
     margin:10px;
+    transition-duration: 800ms;
 }
 .navbar:hover {
     opacity: 0.8;
-
+    transition-duration: 200ms;
 }
 
 .navbar button {
