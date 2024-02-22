@@ -140,7 +140,11 @@ $(document).ready(function() {
             var timestamp = new Date().getTime(); // Get current timestamp
             var todoText = $(this).val();
             $(this).val('');
-            var listItem = $(`<li class='todo-item' id='todo-${timestamp}'><input type="checkbox" class="todo-checkbox"/><span class="editable">${todoText}</span><button class="edit-todo-btn" data-todo-id='todo-${timestamp}'>...</button></li>`);
+            var listItem = $(`<li class='todo-item' id='todo-${timestamp}'><input type="checkbox" class="todo-checkbox"/>
+                <span class="editable">${todoText}</span>
+                <button class="edit-todo-btn" data-todo-id='todo-${timestamp}'>...</button>
+                <div class="due-by"></div> <!-- Placeholder for date -->
+                </li>`);
             listItem.data('description', ''); // Store the description as part of the todo item's data
             listItem.data('date');
             $(this).siblings('.todo-list').append(listItem);
@@ -148,7 +152,7 @@ $(document).ready(function() {
         }
     });
     
-    // Function to add a new step to the process panel
+    // Event handler to add a new step to the process panel
     $(document).on('keypress', '.process-input', function(e) {
         if (e.which == 13) { // Enter key pressed
             var timestamp = new Date().getTime(); // Get current timestamp
@@ -159,7 +163,7 @@ $(document).ready(function() {
                 <button class="edit-process-btn" data-process-id='process-${timestamp}'>...</button>
                 <div class="process-description"></div> <!-- Placeholder for description -->
                 </li>`); 
-            listItem.data('description', ''); // Store the description as part of the todo item's data
+            listItem.data('description', 'Description'); // Store the description as part of the todo item's data
             $(this).siblings('.process-list').append(listItem);
         }
     });
@@ -191,7 +195,7 @@ $(document).ready(function() {
                 </div>`);
                          
     
-        var panel = todoItem.closest('.table-panel, .checklist, .note');
+        var panel = todoItem.closest('.checklist');
         overlay.css({
             width: panel.outerWidth(),
             height: panel.outerHeight(),
@@ -238,36 +242,28 @@ $(document).ready(function() {
             todoItem.find('.editable').text(itemLine); // Update the todo item line
             todoItem.data('description', description); // Store the description as part of the todo item's data
             todoItem.data('date', todoDate); // Store the due date as part of the todo item's data
+            todoItem.find('.due-by').text('Due: ' + todoDate); // Update the description display, which is a <div>
+
 
             // Remove overlay panel after saving
             overlayPanel.remove();
         });       
-    }
-
-   // Function to add a new step to the process panel
-   $(document).on('keypress', '.process-input', function(e) {
-    if (e.which == 13) { // Enter key pressed
-        var timestamp = new Date().getTime(); // Get current timestamp
-        var stepText = $(this).val();
-        $(this).val(''); // Clear the input field after adding the step
-        var listItem = $(`<li>
-            <span class="process-item" id='process-${timestamp}'>${stepText}</span>
-            <button class="edit-process-btn" data-process-id='process-${timestamp}'>...</button>
-            <div class="process-description"></div> <!-- Placeholder for description -->
-            </li>`); 
-        listItem.data('description', ''); // Store the description as part of the todo item's data
-        $(this).siblings('.process-list').append(listItem);
-        }
-    });
+    }    
 
     // Function to create an overlay for the process panel to edit details
     function createProcessOverlayPanel(processId) {
         // Remove any existing overlay before creating a new one
         $('.overlay-panel').remove();
 
-        var processItem = $('#' + processId);
-        var processText = processItem.find('.process-item').text();
-        var description = processItem.data('description'); // Assuming you store additional data like description
+        // Find the button that was clicked and then the corresponding <li> element
+        var processItemBtn = $('#' + processId); // This is the button, not the <span> or <li>
+        var listItem = processItemBtn.closest('li'); // This finds the <li> parent of the button
+        
+        //var processItem = $('#' + processId);
+        //console.log(processItem);
+        var processText = listItem.find('.process-item').text();
+        var description = listItem.data('description');
+        console.log(processText, description);
 
         var overlayHtml = `<div class="overlay-panel">
             <div class="overlay-title" style='text-align:center;background-color:#202020;'>Edit Process</div>
@@ -283,7 +279,7 @@ $(document).ready(function() {
             </div>
         </div>`;
 
-        var panel = processItem.closest('.process-panel');
+        var panel = processItemBtn.closest('.process-panel');
         var overlay = $(overlayHtml).css({
             width: panel.outerWidth(),
             height: panel.outerHeight(),
@@ -302,18 +298,17 @@ $(document).ready(function() {
             var overlayPanel = $(this).closest('.overlay-panel');
             var title = overlayPanel.find('#process-title').val(); // Get updated title from input
             var description = overlayPanel.find('#process-description').val(); // Get updated description from textarea
-        
+
             // Assuming processId is the ID of the button which needs to target its corresponding process item
             var processIdButton = $('#' + processId); // This is your button
             var listItem = processIdButton.closest('li'); // Find the <li> parent of the button
-        
+
             listItem.find('.process-item').text(title); // Update the text/title of the process item, which is a <span>
             listItem.data('description', description); // Store the updated description in the data of the <li>
             listItem.find('.process-description').text(description); // Update the description display, which is a <div>
-        
+
             overlayPanel.remove(); // Remove overlay panel after saving
         });
-   
     }
 
 

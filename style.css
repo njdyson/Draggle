@@ -142,17 +142,24 @@ body, html {
     padding: 5px 5px;
     color: #ffffff;
     line-height: 2;
+    font-size: 16px;
 }
 
-.process-description {
+.process-description{
     font-size: 0.9em; /* Smaller than the main text to show it's secondary */
     color: #686868; /* A lighter shade than the main text for distinction */
     margin-top: 3px; /* Space from the main text */
     margin-bottom: 3px;
-    padding-left: 15px; /* Indent to align under the main text if needed */
+    padding-left: 20px; /* Indent to align under the main text if needed */
     font-style: italic; /* Italicize to differentiate from main content */
     max-width: 90%; /* Prevents overflow, adjust per your layout */
     word-wrap: break-word; /* Ensures long words don't overflow */
+}
+
+.due-by {
+    font-size: 0.8em; /* Smaller than the main text to show it's secondary */
+    color: #686868;
+    margin-right: 40px;
 }
 
 
@@ -366,6 +373,7 @@ body, html {
     overflow: hidden; /* Ensure content doesn't overflow */
     border-radius: 5px;
     box-sizing: border-box;
+    
 }
 
 .overlay-title {
