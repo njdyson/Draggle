@@ -298,17 +298,19 @@ $(document).ready(function() {
             overlay.remove();
         });
 
-        // Updated event handler for saving the updated process item
         $('#canvas').off('click', '#save-process').on('click', '#save-process', function() {
             var overlayPanel = $(this).closest('.overlay-panel');
-            var title = overlayPanel.find('#process-title').val(); // Get updated title
-            var description = overlayPanel.find('#process-description').val(); // Get updated description
-
-            var processItem = $('#' + processId); // Assuming processId is the ID of the <li>
-            processItem.find('.process-item').val(title); // Update the text/title of the process item
-            processItem.data('description', description); // Store the updated description
-            processItem.find('.process-description').val(description); // Update the description display
-
+            var title = overlayPanel.find('#process-title').val(); // Get updated title from input
+            var description = overlayPanel.find('#process-description').val(); // Get updated description from textarea
+        
+            // Assuming processId is the ID of the button which needs to target its corresponding process item
+            var processIdButton = $('#' + processId); // This is your button
+            var listItem = processIdButton.closest('li'); // Find the <li> parent of the button
+        
+            listItem.find('.process-item').text(title); // Update the text/title of the process item, which is a <span>
+            listItem.data('description', description); // Store the updated description in the data of the <li>
+            listItem.find('.process-description').text(description); // Update the description display, which is a <div>
+        
             overlayPanel.remove(); // Remove overlay panel after saving
         });
    

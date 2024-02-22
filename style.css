@@ -145,10 +145,11 @@ body, html {
 }
 
 .process-description {
-    font-size: 0.8em; /* Smaller than the main text to show it's secondary */
+    font-size: 0.9em; /* Smaller than the main text to show it's secondary */
     color: #686868; /* A lighter shade than the main text for distinction */
-    margin-top: 4px; /* Space from the main text */
-    padding-left: 10px; /* Indent to align under the main text if needed */
+    margin-top: 3px; /* Space from the main text */
+    margin-bottom: 3px;
+    padding-left: 15px; /* Indent to align under the main text if needed */
     font-style: italic; /* Italicize to differentiate from main content */
     max-width: 90%; /* Prevents overflow, adjust per your layout */
     word-wrap: break-word; /* Ensures long words don't overflow */
