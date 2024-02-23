@@ -29,7 +29,7 @@ body, html {
     display: flex;
     flex-direction: column;
     overflow-x: hidden; /* Ensure content doesn't overflow */
-    overflow-y: auto;
+    overflow-y: hidden;
     opacity: 0.9;
     border-radius: 5px;
     box-sizing: border-box;
@@ -81,10 +81,11 @@ body, html {
     height: 5px;
     background-color: #8b8b8b;
     border-radius: 5px;
-    margin: 4px auto 8px; /* Centered horizontally, thinner */
+    margin: 8px auto 8px; /* Centered horizontally, thinner */
     cursor: grab;
     top: 0px;
     opacity: 0.5;
+    position: sticky;
 }
 .handle:hover {
     opacity: 1;
@@ -96,6 +97,7 @@ body, html {
     padding-left:15px;
     margin: 0;
     list-style-type: none; /* Remove default list styling */
+    overflow-y: auto; /* Add vertical scrollbar */
 }
 
 .todo-item {
@@ -135,6 +137,8 @@ body, html {
     padding-top:10px;
     padding-left: 15px; /* Adjust based on your design preference */
     color: #ffffff; /* Matching the color scheme */
+    overflow-y: auto; /* Add vertical scrollbar */
+
 }
 
 

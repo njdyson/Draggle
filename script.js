@@ -11,6 +11,7 @@ $(document).ready(function() {
     var centerX = 0;
     var centerY = 0;
     
+    makeSubtasksSortable();
 
     // Event handler for adding a new checklist
     $('#addChecklist').click(function() {
@@ -146,10 +147,7 @@ $(document).ready(function() {
                                     <span class="editable">${todoText}</span>
                                     <div class="due-by"></div> <!-- Placeholder for date -->
                                 </div>
-                                <ul class='subtasks'> <!-- Subtasks are indented and placed below the inline elements -->
-                                    <!--<li class='subtask'><input type="checkbox" class="todo-checkbox"/><span class="editable">Subtask 1</span></li>-->
-                                    <!--<li class='subtask'><input type="checkbox" class="todo-checkbox"/><span class="editable">Subtask 2</span></li>-->
-                                </ul>
+                                <ul class='subtasks'></ul>
                             </li>`);
             listItem.data('description', ''); // Store the description as part of the todo item's data
             listItem.data('date');
@@ -232,11 +230,67 @@ $(document).ready(function() {
         var subtasksList = $('#' + todoId).find('.subtasks');
 
         // Append the new subtask HTML to the <ul class='subtasks'>
-        subtasksList.append("<li class='subtask'><input type='checkbox' class='todo-checkbox'/><span class='editable'>Subtask</span></li>");
-
+        var uniqueSubtaskId = 'subtask-' + Date.now(); // Simple example for generating a unique ID
+        subtasksList.append('<li class="subtask" id="' + uniqueSubtaskId + '" data-due-date=""><input type="checkbox" class="todo-checkbox"/><span class="editable">Subtask</span></li>');
+        makeSubtasksSortable();
+        
         // Cleanup: remove the context menu
         $('#contextMenu').remove();
     });
+
+    // Function to make subtasks sortable
+    function makeSubtasksSortable() {
+        $(".subtasks").sortable({
+            items: "li.subtask", // Only make the li.subtask elements sortable
+            containment: "parent", // Constrain sorting to within the parent ul.subtasks element
+            axis: "y", // Constrain movement to the y-axis
+            update: function(event, ui) {
+                // Optional: Callback function that runs when the order changes.
+                // Use this if you need to save the order persistently.
+            }
+        }).disableSelection(); // Prevent text selection during dragging
+    }
+
+    // Function to show the subtask context menu
+    function showSubtaskContextMenu(subtaskId, pageX, pageY) {
+        // Remove existing contextMenu if any
+        $('.subtask-contextMenu').remove();
+
+        const contextMenu = document.createElement('div');
+        contextMenu.className = 'subtask-contextMenu context-menu';
+        contextMenu.innerHTML = `<ul class="context-menu"><li class="context-menu-item" data-action="delete-subtask" data-subtask-id="${subtaskId}">Delete</li></ul>`;
+        document.body.appendChild(contextMenu);
+
+        contextMenu.style.top = `${pageY}px`;
+        contextMenu.style.left = `${pageX}px`;
+        contextMenu.classList.add('show');
+    }
+
+    // Attach context menu to subtasks
+    $(document).on('contextmenu', '.subtask', function(event) {
+        event.preventDefault();
+
+        var subtaskId = $(this).attr('id'); // Ensure each subtask has a unique ID when created
+        showSubtaskContextMenu(subtaskId, event.pageX, event.pageY);
+
+        // Prevent the document-level click handler from immediately removing the context menu
+        event.stopPropagation();
+    });
+
+    // Global event handler for deleting a subtask
+    $(document).on('click', '.subtask-contextMenu [data-action="delete-subtask"]', function() {
+        var subtaskId = $(this).data('subtask-id');
+        $('#' + subtaskId).remove(); // Remove the subtask
+
+        // Cleanup: remove the context menu
+        $('.subtask-contextMenu').remove();
+    });
+
+    // Hide the subtask context menu when clicking elsewhere
+    $(document).on('click', function() {
+        $('.subtask-contextMenu').remove();
+    });
+
     
     // Create overlay to checklist to edit details
     function createOverlayPanel(todoId) {
