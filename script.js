@@ -140,11 +140,18 @@ $(document).ready(function() {
             var timestamp = new Date().getTime(); // Get current timestamp
             var todoText = $(this).val();
             $(this).val('');
-            var listItem = $(`<li class='todo-item' id='todo-${timestamp}'><input type="checkbox" class="todo-checkbox"/>
-                <span class="editable">${todoText}</span>
-                <button class="edit-todo-btn" data-todo-id='todo-${timestamp}'>...</button>
-                <div class="due-by"></div> <!-- Placeholder for date -->
-                </li>`);
+            var listItem = $(`<li class='todo-item' id='todo-${timestamp}'>
+                                <div class="todo-content"> <!-- This div wraps the inline elements -->
+                                    <input type="checkbox" class="todo-checkbox"/>
+                                    <span class="editable">${todoText}</span>
+                                    <div class="due-by"></div> <!-- Placeholder for date -->
+                                    <button class="edit-todo-btn" data-todo-id='todo-${timestamp}'>...</button>
+                                </div>
+                                <ul class='subtasks'> <!-- Subtasks are indented and placed below the inline elements -->
+                                    <li class='subtask'><input type="checkbox" class="todo-checkbox"/><span class="editable">Subtask 1</span></li>
+                                    <li class='subtask'><input type="checkbox" class="todo-checkbox"/><span class="editable">Subtask 2</span></li>
+                                </ul>
+                            </li>`);
             listItem.data('description', ''); // Store the description as part of the todo item's data
             listItem.data('date');
             $(this).siblings('.todo-list').append(listItem);

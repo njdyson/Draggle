@@ -100,9 +100,28 @@ body, html {
 
 .todo-item {
     display: flex;
-    align-items: center; /* Vertical alignment */
-    justify-content: flex-start; /* Align items to the left */
+    flex-direction: column; /* Ensures vertical stacking of todo-content and subtasks */
     color: #ffffff;
+    padding: 5px 0;
+}
+
+.todo-content {
+    display: flex;
+    align-items: center; /* Keeps items within todo-content aligned horizontally */
+    width: 100%; /* Ensures it stretches to full width */
+}
+
+.subtasks {
+    display: block; /* Allows natural flow below todo-content */
+    margin-top: 5px;
+    padding-left: 20px; /* Indentation for visual hierarchy */
+    list-style-type: none; /* Keeps it clean by removing bullet points */
+}
+
+.subtask {
+    color: #ffffff;
+    font-size: 0.9em; /* Smaller font size for subtasks */
+    margin-bottom: 5px; /* Space between subtasks */
 }
 
 .todo-content {
@@ -340,18 +359,18 @@ body, html {
     user-select: none; /* Prevent text selection */
 }
 
-.edit-todo-btn, .edit-process-btn{
-    padding: 4px 8px;
+.edit-todo-btn {
+    padding: 5px 5px;
     font-size: 12px;
     color: #fff;
-    border: none; /* Remove the border */
-    background: none; /* Remove the background */
+    border: none; /* Correctly remove the border */
+    background: none; /* Correctly remove the background */
     border-radius: 4px;
     cursor: pointer;
-    margin-left: 10px;
+    margin-left: 2px; /* Space between buttons */
     opacity: 0.6;
-    right:10px;
-    position: absolute;
+    /* Remove 'position: absolute' and 'right: 10px;' to avoid absolute positioning conflicts */
+    /* display: inline-block; is not necessary when parent is flex */
 }
 
 .edit-todo-btn:hover, .edit-process-btn:hover {
