@@ -113,7 +113,6 @@ body, html {
 
 .subtasks {
     display: block; /* Allows natural flow below todo-content */
-    margin-top: 5px;
     padding-left: 20px; /* Indentation for visual hierarchy */
     list-style-type: none; /* Keeps it clean by removing bullet points */
 }
@@ -178,7 +177,7 @@ body, html {
 .due-by {
     font-size: 0.8em; /* Smaller than the main text to show it's secondary */
     color: #686868;
-    margin-right: 40px;
+    margin-right: 10px;
 }
 
 
@@ -500,5 +499,37 @@ body, html {
     height:0;
 }
 
+/* Context Menu Styles */
+.context-menu {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    width: 160px;
+    background-color: #303030; /* Matching the panel background color */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 5px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex; /* Add flexbox to center the items */
+    flex-direction: column; /* Stack the items vertically */
+}
 
+.context-menu.show {
+    display: block;
+}
+
+.context-menu-item {
+    padding: 10px 10px;
+    color: #ffffff; /* Matching the text color */
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    width: 100%; /* Make the menu items full width */
+    list-style: none; /* Remove the list bullet styling */
+    box-sizing: border-box;
+}
+
+.context-menu-item:hover {
+    background-color: #505050; /* Slightly lighter than item background for hover state */
+}
   

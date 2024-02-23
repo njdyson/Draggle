@@ -145,11 +145,10 @@ $(document).ready(function() {
                                     <input type="checkbox" class="todo-checkbox"/>
                                     <span class="editable">${todoText}</span>
                                     <div class="due-by"></div> <!-- Placeholder for date -->
-                                    <button class="edit-todo-btn" data-todo-id='todo-${timestamp}'>...</button>
                                 </div>
                                 <ul class='subtasks'> <!-- Subtasks are indented and placed below the inline elements -->
-                                    <li class='subtask'><input type="checkbox" class="todo-checkbox"/><span class="editable">Subtask 1</span></li>
-                                    <li class='subtask'><input type="checkbox" class="todo-checkbox"/><span class="editable">Subtask 2</span></li>
+                                    <!--<li class='subtask'><input type="checkbox" class="todo-checkbox"/><span class="editable">Subtask 1</span></li>-->
+                                    <!--<li class='subtask'><input type="checkbox" class="todo-checkbox"/><span class="editable">Subtask 2</span></li>-->
                                 </ul>
                             </li>`);
             listItem.data('description', ''); // Store the description as part of the todo item's data
@@ -158,7 +157,7 @@ $(document).ready(function() {
 
         }
     });
-    
+
     // Event handler to add a new step to the process panel
     $(document).on('keypress', '.process-input', function(e) {
         if (e.which == 13) { // Enter key pressed
@@ -174,6 +173,70 @@ $(document).ready(function() {
             $(this).siblings('.process-list').append(listItem);
         }
     });
+
+    // Function to create and show the context menu
+    function showContextMenu(todoId, pageX, pageY) {
+        // Remove existing contextMenu if any
+        $('#contextMenu').remove();
+
+        const contextMenu = document.createElement('div');
+        contextMenu.id = 'contextMenu';
+        contextMenu.className = 'context-menu';
+        contextMenu.innerHTML = `
+            <ul class="context-menu">
+                <li class="context-menu-item" data-action="edit" data-todo-id="${todoId}">Edit</li>
+                <li class="context-menu-item" data-action="delete" data-todo-id="${todoId}">Delete</li>
+                <li class="context-menu-item" data-action="add-subtask" data-todo-id="${todoId}">Add Subtask</li>
+            </ul>
+        `;
+        document.body.appendChild(contextMenu);
+
+        contextMenu.style.top = `${pageY}px`;
+        contextMenu.style.left = `${pageX}px`;
+        contextMenu.classList.add('show');
+    }
+
+    $(document).on('contextmenu', '.todo-content', function(event) {    
+        event.preventDefault();
+        
+        var todoId = $(this).closest('.todo-item').attr('id');
+
+        showContextMenu(todoId, event.pageX, event.pageY);
+
+        // Add event listener for the Edit action
+        contextMenu.querySelector('[data-action="edit"]').addEventListener('click', function() {
+            createOverlayPanel(todoId); // Call createOverlayPanel with the todoId
+        });
+
+        // Close and remove the context menu on document click
+        $(document).on('click', function(e) {
+            $('#contextMenu').remove();
+        });
+    });
+
+    // Separate event handler for delete action, attached only once
+    $(document).on('click', '#contextMenu [data-action="delete"]', function() {
+        var todoId = $(this).data('todo-id'); // Retrieve the todoId stored in data attribute
+
+        // Confirm deletion
+        if (confirm('Are you sure you want to delete this todo item?')) {
+            $('#' + todoId).remove(); // Remove the todo item using its ID
+        }
+    });
+
+    // Global event handler for the Add Subtask action, attached only once
+    $(document).on('click', '#contextMenu [data-action="add-subtask"]', function() {
+        var todoId = $(this).data('todo-id'); // Retrieve the todoId stored in data attribute
+
+        // Use the todoId to find the specific <ul class='subtasks'> within the todo item
+        var subtasksList = $('#' + todoId).find('.subtasks');
+
+        // Append the new subtask HTML to the <ul class='subtasks'>
+        subtasksList.append("<li class='subtask'><input type='checkbox' class='todo-checkbox'/><span class='editable'>Subtask</span></li>");
+
+        // Cleanup: remove the context menu
+        $('#contextMenu').remove();
+    });
     
     // Create overlay to checklist to edit details
     function createOverlayPanel(todoId) {
@@ -181,7 +244,7 @@ $(document).ready(function() {
         $('.overlay-panel').remove();
     
         var todoItem = $('#' + todoId);
-        var todoText = todoItem.find('.editable').text();
+        var todoText = todoItem.find('.todo-content .editable').text();
         var description = todoItem.data('description');
         var currentTodoDate = todoItem.data('date'); // Get the current date
     
@@ -246,11 +309,10 @@ $(document).ready(function() {
 
             // Find the original todo item and update its contents
             var todoItem = $('#' + todoId);
-            todoItem.find('.editable').text(itemLine); // Update the todo item line
+            todoItem.find('.todo-content .editable').text(itemLine); // Update the todo item line
             todoItem.data('description', description); // Store the description as part of the todo item's data
             todoItem.data('date', todoDate); // Store the due date as part of the todo item's data
-            todoItem.find('.due-by').text('Due: ' + todoDate); // Update the description display, which is a <div>
-
+            todoItem.find('.due-by').text(todoDate); // Update the description display, which is a <div>
 
             // Remove overlay panel after saving
             overlayPanel.remove();
