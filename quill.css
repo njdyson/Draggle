@@ -1,7 +1,7 @@
 /*! * Quill Editor v2.0.0-rc.2 * https://quilljs.com * Copyright (c) 2017-2024, Slab * Copyright (c) 2014, Jason Chen * Copyright (c) 2013, salesforce.com */
 .ql-container{
     box-sizing:border-box;
-    font-family:Helvetica,Arial,sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     font-size:13px;
     height:100%;
     margin:0;
@@ -421,7 +421,7 @@
     color:#93f
 }
 .ql-editor .ql-font-serif{
-    font-family:Georgia,Times New Roman,serif
+    font-family: Arial, Helvetica, sans-serif;
 }
 .ql-editor .ql-font-monospace{
     font-family:Monaco,Courier New,monospace
@@ -817,7 +817,7 @@
 .ql-toolbar.ql-snow{
     border:none;
     box-sizing:border-box;
-    font-family:'Helvetica Neue','Helvetica','Arial',sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     padding:8px
 }
 .ql-toolbar.ql-snow .ql-formats{

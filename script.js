@@ -1,17 +1,47 @@
 // When the document is ready, execute this function
 $(document).ready(function() { 
    
+    //User data - to be replaced with data from the server
+    var username = "nick";
+    var timestamp = new Date().getTime(); // Get current timestamp
+    var boardID = username.toUpperCase() + timestamp;
+    lastboard = localStorage.getItem('lastLoadedBoard');
+    
     // Declare vaiables
-    var grid_size_x = $(window).width() / 80; // Define the x grid size as one 40th of the screen width
-    var grid_size_y = $(window).height() / 40; // Define the y grid size as one 40th of the screen height
-    var panel_width = $(window).width() / 8; // Define the default panel width
-    var panel_height = $(window).height() / 4; // Define the default panel height
-    //var centerX = Math.round(($('#canvas').width() / 2 - panel_width / 2) / grid_size) * grid_size;// Calculate the center x position for the new panel
-    //var centerY = Math.round(($('#canvas').height() / 2 - panel_height / 2) / grid_size) * grid_size;// Calculate the center y position for the new panel
-    var centerX = 0;
-    var centerY = 0;
+    var grid_size = 10;
+    var panel_width = 400; // Define the default panel width
+    var panel_height = 300; // Define the default panel height
+    var initial_pos_x = 0;
+    var initial_pos_y = 0;
+
+    fetch(lastboard)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data); // Here you can work with your JSON data
+    })
+    .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+    });
     
     makeSubtasksSortable();
+    makeTitleEditable();
+
+    //Function to create a new board
+    function newBoard() {
+        // Clear existing panels and notes
+        $('.checklist, .note .table-panel .process-panel').remove();
+
+        var timestamp = new Date().getTime(); // Get current timestamp
+        var boardID = username + timestamp;
+
+        // Set the board title
+        $("#canvasTitle").text("New Board");
+    }
 
     // Event handler for adding a new checklist
     $('#addChecklist').click(function() {
@@ -20,7 +50,7 @@ $(document).ready(function() {
         var panelId = 'checklist-' + checklistCount;
     
         // HTML markup for the new panel
-        var panelHtml = `<div class="checklist" id="${panelId}" style="left:${centerX}px; top:${centerY}px;">
+        var panelHtml = `<div class="checklist" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
         <div class="handle"></div> <!-- Handle for dragging the panel -->
         <button class="delete-panel">X</button> <!-- Delete button -->
         <input type="text" class="panel-title" value="Checklist ${checklistCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
@@ -38,7 +68,7 @@ $(document).ready(function() {
         var panelId = 'note-' + noteCount;
 
         var editorId = 'editor-' + noteCount; // Generate a unique ID for each editor instance
-        var panelHtml = `<div class="note" id="${panelId}" style="left:${centerX}px; top:${centerY}px;">
+        var panelHtml = `<div class="note" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
             <div class="handle"></div>
             <button class="delete-panel">X</button>
             <div id="${editorId}"></div> <!-- Unique ID for the Quill editor container -->
@@ -58,11 +88,12 @@ $(document).ready(function() {
         });
     });
     
+    // Event handler for adding a tabel panel
     $('#addTable').click(function() {
         var tableCount = $('.table-panel').length + 1;
         var panelId = 'table-' + tableCount;
     
-        var panelHtml = `<div class="table-panel" id="${panelId}" style="left:${centerX}px; top:${centerY}px;">
+        var panelHtml = `<div class="table-panel" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
             <div class="handle"></div>
             <button class="delete-panel">X</button>
             <input type="text" class="panel-title" value="Table ${tableCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
@@ -82,11 +113,12 @@ $(document).ready(function() {
         positionPlusSymbols(panelId);
     });
 
+    // Event handler for adding a new process panel
     $('#addProcess').click(function() {
         var processCount = $('.process-panel').length + 1;
         var panelId = 'process-' + processCount;
     
-        var panelHtml = `<div class="process-panel" id="${panelId}" style="left:${centerX}px; top:${centerY}px;">
+        var panelHtml = `<div class="process-panel" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
             <div class="handle"></div>
             <button class="delete-panel">X</button>
             <input type="text" class="panel-title" value="Process ${processCount}">
@@ -97,26 +129,32 @@ $(document).ready(function() {
         createPanel(panelHtml, panelId);
 
     });
-    
 
+    //Add the panel to the canvas
     function createPanel(panelHtml, panelId) {
         // Append the new panel to the canvas
         $('#canvas').append(panelHtml);
 
+        $('#' + panelId).css({
+            minWidth: panel_width,
+            minHeight: panel_height,
+            width: panel_width,
+            height: panel_height
+        })
+        
         $('#' + panelId).draggable({
             handle: ".handle", // Specify the handle for dragging
             cancel: ".panel-title, .editable", // Specify elements to exclude from dragging
-            grid: [grid_size_x, grid_size_y], // Set the grid size to snap to during dragging
+            grid: [grid_size, grid_size], // Set the grid size to snap to during dragging
             containment: "#canvas" // Specify the containment element
         }).resizable({
-            minHeight: 200, // Set the minimum height of the panel
-            minWidth: 200, // Set the minimum width of the panel
-            grid: [grid_size_x, grid_size_y], // Set the grid size to snap to during resizing
+            minHeight: panel_height, // Set the minimum height of the panel
+            minWidth: panel_width, // Set the minimum width of the panel
+            grid: [grid_size, grid_size] // Set the grid size to snap to during resizing
         });
 
-        // Check if this is a process panel and make its list sortable
-        if ($('#' + panelId).hasClass('process-panel')) {
-            $('#' + panelId + ' .process-list').sortable({
+        function makePanelSortable(panelId, listClass) {
+            $('#' + panelId + ' .' + listClass).sortable({
                 placeholder: "sortable-placeholder",
                 update: function(event, ui) {
                     updateProcessNumbers(panelId);
@@ -124,15 +162,11 @@ $(document).ready(function() {
             }).disableSelection();
         }
 
-        // Check if this is a checklist panel and make its list sortable
-        if ($('#' + panelId).hasClass('checklist')) {
-            $('#' + panelId + ' .todo-list').sortable({
-                placeholder: "sortable-placeholder",
-                update: function(event, ui) {
-                    updateProcessNumbers(panelId);
-                }
-            }).disableSelection();
-        }
+        // Call the sortable function for process panels
+        makePanelSortable(panelId, 'process-list');
+        
+        // Call the sortable function for checklist panels
+        makePanelSortable(panelId, 'todo-list');
     }
 
      // Event handler for adding a new todo item
@@ -172,7 +206,7 @@ $(document).ready(function() {
         }
     });
 
-    // Function to create and show the context menu
+    // Function to create and show the todo parent item context menu
     function showContextMenu(todoId, pageX, pageY) {
         // Remove existing contextMenu if any
         $('#contextMenu').remove();
@@ -194,6 +228,7 @@ $(document).ready(function() {
         contextMenu.classList.add('show');
     }
 
+    // Attach context menu to todo items
     $(document).on('contextmenu', '.todo-content', function(event) {    
         event.preventDefault();
         
@@ -201,7 +236,7 @@ $(document).ready(function() {
 
         showContextMenu(todoId, event.pageX, event.pageY);
 
-        // Add event listener for the Edit action
+        // Add event listener for the Edit todo item action
         contextMenu.querySelector('[data-action="edit"]').addEventListener('click', function() {
             createOverlayPanel(todoId); // Call createOverlayPanel with the todoId
         });
@@ -212,7 +247,7 @@ $(document).ready(function() {
         });
     });
 
-    // Separate event handler for delete action, attached only once
+    // Separate event handler for delete action to avoid nested event listeners
     $(document).on('click', '#contextMenu [data-action="delete"]', function() {
         var todoId = $(this).data('todo-id'); // Retrieve the todoId stored in data attribute
 
@@ -222,7 +257,7 @@ $(document).ready(function() {
         }
     });
 
-    // Global event handler for the Add Subtask action, attached only once
+    // Event handler for the Add Subtask action
     $(document).on('click', '#contextMenu [data-action="add-subtask"]', function() {
         var todoId = $(this).data('todo-id'); // Retrieve the todoId stored in data attribute
 
@@ -231,7 +266,7 @@ $(document).ready(function() {
 
         // Append the new subtask HTML to the <ul class='subtasks'>
         var uniqueSubtaskId = 'subtask-' + Date.now(); // Simple example for generating a unique ID
-        subtasksList.append('<li class="subtask" id="' + uniqueSubtaskId + '" data-due-date=""><input type="checkbox" class="todo-checkbox"/><span class="editable">Subtask</span></li>');
+        subtasksList.append('<li class="subtask" id="' + uniqueSubtaskId + '" data-due-date=""><input type="checkbox" class="todo-checkbox"/><span class="editable" placeholder="Subtask">Subtask</span></li>');
         makeSubtasksSortable();
         
         // Cleanup: remove the context menu
@@ -266,7 +301,7 @@ $(document).ready(function() {
         contextMenu.classList.add('show');
     }
 
-    // Attach context menu to subtasks
+    // Event handler to attach context menu to subtasks
     $(document).on('contextmenu', '.subtask', function(event) {
         event.preventDefault();
 
@@ -277,16 +312,16 @@ $(document).ready(function() {
         event.stopPropagation();
     });
 
-    // Global event handler for deleting a subtask
+    // Global event handler for deleting a subtask using the subtask context menu
     $(document).on('click', '.subtask-contextMenu [data-action="delete-subtask"]', function() {
         var subtaskId = $(this).data('subtask-id');
         $('#' + subtaskId).remove(); // Remove the subtask
 
         // Cleanup: remove the context menu
-        $('.subtask-contextMenu').remove();
+        $('.subtask-contextMenu').remove();     
     });
 
-    // Hide the subtask context menu when clicking elsewhere
+    // Hide context menu when clicking elsewhere
     $(document).on('click', function() {
         $('.subtask-contextMenu').remove();
     });
@@ -504,11 +539,6 @@ $(document).ready(function() {
         makeCellsEditable();
 
     });
-
-    $(document).on('click', '.edit-todo-btn', function() {
-        var todoId = $(this).attr('data-todo-id');
-        createOverlayPanel(todoId);
-    });
     
     $(document).on('click', '.edit-process-btn', function() {
         var processId = $(this).attr('data-process-id');
@@ -534,16 +564,7 @@ $(document).ready(function() {
 
     // Event handler for clearing the board when the newBoard button is pressed
     $('#newBoard').click(function() {
-        // Clear existing panels and notes
-        $('.checklist, .note').remove();
-
-        // Reset panel count if necessary
-        var checklistCount = 0;
-        var noteCount = 0;
-        var tableCount = 0;
-
-        // Set the board title
-        $("#canvasTitle").text("New Board");
+        newBoard();
     });
 
     function makeTitleEditable() {
@@ -563,10 +584,6 @@ $(document).ready(function() {
             });
         });
     }
-    
-
-    // Initialize the editable title functionality
-    makeTitleEditable();
 
     // Function to save a text file to a local folder
     function saveTextFile() {
@@ -588,6 +605,7 @@ $(document).ready(function() {
     function collectBoardData() {
         var boardData = {
             boardTitle: $("#canvasTitle").text(),
+            boardID: boardID,
             items: []
         };
     
@@ -598,9 +616,10 @@ $(document).ready(function() {
             panel.find('.todo-item').each(function() {
                 var todoItem = $(this);
                 checklistItems.push({
-                    text: todoItem.find('.editable').text(),
+                    text: todoItem.find('.todo-content .editable').html(),
                     description: todoItem.data('description'),
-                    date: todoItem.data('date')
+                    date: todoItem.data('date'),
+                    subtasks: todoItem.find('.subtasks').html()
                 });
             });
     
@@ -610,8 +629,7 @@ $(document).ready(function() {
                 location: { top: panel.css('top'), left: panel.css('left') },
                 size: { width: panel.width(), height: panel.height() },
                 title: panel.find('.panel-title').val(),
-                todos: checklistItems,
-                content: panel.find('.todo-list').html() // Capture the HTML content of the todo-list
+                todos: checklistItems
             };
             boardData.items.push(item);
         });
@@ -625,7 +643,7 @@ $(document).ready(function() {
                 location: { top: note.css('top'), left: note.css('left') },
                 size: { width: note.width(), height: note.height() },
                 title: note.find('.panel-title').val(),
-                content: note.find('.note-body').html()
+                content: note.find('.ql-editor').html()
             };
             boardData.items.push(item);
         });
@@ -718,9 +736,51 @@ $(document).ready(function() {
             }
 
             createPanel(panelHtml, item.id);
-        });
-
-        
+        });    
     }
     
+    // Add an event listener for the settings button
+    document.getElementById('settings').addEventListener('click', function() {
+        toggleSettingsOverlay(); // Call function to toggle the visibility of the settings overlay
+    });
+
+    function toggleSettingsOverlay() {
+        if ($('.settings-overlay').length === 0) {
+            // Create the overlay if it doesn't exist
+            var overlayHtml = `<div class="settings-overlay">
+                <div class="overlay-title">Settings</div>
+                <div style="padding: 15px;">
+                    <label for="board-id">Board ID:</label>
+                    <span>${boardID}</span><br>
+                    <label for="background-selector">Background:</label>
+                    <select id="background-selector" class="overlay-select">
+                        <option value="Rice.jpg">Rice</option>
+                        <option value="Bridge.jpg">Bridge</option>
+                        <option value="Road.jpg">Road</option>
+                        <option value="Mist.jpg">Mist</option>
+                        <!-- Add more options here -->
+                    </select>
+                </div>
+                <div class="overlay-nav">
+                    <button id='save-settings' class="overlay-button">Save</button>
+                    <button id='close-overlay' class="overlay-button">Cancel</button>
+                </div>
+            </div>`;
+    
+            $('#canvas').append(overlayHtml);
+        }
+
+        // Close button functionality
+        $('#close-overlay').click(function() {
+            $('.settings-overlay').remove();
+        });
+
+        // Save button functionality
+        $('#save-settings').click(function() {
+            var selectedBackground = $('#background-selector').val();
+            $('body').css('background-image', 'url("Backgrounds/' + selectedBackground + '")');
+            $('.settings-overlay').remove(); //close the overlay on save
+        });
+    }
+
 });
