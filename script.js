@@ -123,7 +123,7 @@ $(document).ready(function() {
         $('#canvas').append(panelHtml);
 
         $('#' + panelId).css({
-            minWidth: panel_width,
+            minWidth: 250,
             minHeight: panel_height,
             width: panel_width,
             height: panel_height,
@@ -141,7 +141,7 @@ $(document).ready(function() {
             }
         }).resizable({
             minHeight: panel_height, // Set the minimum height of the panel
-            minWidth: panel_width, // Set the minimum width of the panel
+            minWidth: 250, // Set the minimum width of the panel
             grid: [grid_size, grid_size] // Set the grid size to snap to during resizing
         });
 
@@ -251,29 +251,34 @@ $(document).ready(function() {
 
     // Event handler for the Add Subtask action
     $(document).on('click', '#contextMenu [data-action="add-subtask"]', function() {
-        addSubtask.call(this);
+        var todoId = $(this).data('todo-id'); // Retrieve the todoId stored in data attribute
+        
+        addSubtask(todoId);
     });
 
     // Event handler for pressing Enter on the .subtask .editable field
     $(document).on('keypress', '.subtask .editable', function(e) {
         if (e.which == 13) { // Enter key pressed
             e.preventDefault(); // Prevent the default action (inserting a new line)
-            addSubtask.call(this);
+            
+            var todoId = $(this).closest('.todo-item').attr('id'); // Retrieve the todoId from the closest .todo-item element
+            if (todoId) {
+                addSubtask(todoId); // Call the addSubtask function with the todoId
+            } else {
+                console.error("Todo ID not found for subtask.");
+            }
         }
     });
 
-    function addSubtask() {
-        var todoId = $(this).data('todo-id'); // Retrieve the todoId stored in data attribute
-
-        // Use the todoId to find the specific <ul class='subtasks'> within the todo item
+    function addSubtask(todoId) {
         var subtasksList = $('#' + todoId).find('.subtasks');
-
-        // Append the new subtask HTML to the <ul class='subtasks'>
-        var uniqueSubtaskId = 'subtask-' + Date.now(); // Simple example for generating a unique ID
-        subtasksList.append('<li class="subtask" id="' + uniqueSubtaskId + '" data-due-date=""><input type="checkbox" class="todo-checkbox"/><span class="editable">Subtask</span></li>');
+        var uniqueSubtaskId = 'subtask-' + Date.now();
+        subtasksList.append('<li class="subtask" id="' + uniqueSubtaskId + '" data-due-date=""><input type="checkbox" class="todo-checkbox"/><span class="editable" contenteditable="true" tabindex="-1"></span></li>');
         makeSubtasksSortable();
 
-        // Cleanup: remove the context menu
+        // Focus on the newly created .editable field
+        $('#' + uniqueSubtaskId + ' .editable').focus();
+
         $('#contextMenu').remove();
     }
 
