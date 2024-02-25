@@ -765,6 +765,7 @@ $(document).ready(function() {
                     <span>${boardID}</span><br>
                     <label for="background-selector">Background:</label>
                     <select id="background-selector" class="overlay-select">
+                        <option value=""></option>
                         <option value="Rice.jpg">Rice</option>
                         <option value="Bridge.jpg">Bridge</option>
                         <option value="Road.jpg">Road</option>
@@ -782,8 +783,7 @@ $(document).ready(function() {
                     <input type="checkbox" id="toggle-board-title" class="overlay-checkbox" ${isBoardTitleVisible ? 'checked' : ''}> <!-- Set the 'checked' attribute based on the visibility of the board title -->
                 </div>
                 <div class="overlay-nav">
-                    <button id='save-settings' class="overlay-button">Save</button>
-                    <button id='close-overlay' class="overlay-button">Cancel</button>
+                    <button id='close-overlay' class="overlay-button">Close</button>
                 </div>
             </div>`;
 
@@ -795,16 +795,21 @@ $(document).ready(function() {
             $('.settings-overlay').remove();
         });
 
-        // Save button functionality
-        $('#save-settings').click(function() {
-            var selectedBackground = $('#background-selector').val();
+        // Event listeners for input elements
+        $('#background-selector').change(function() {
+            var selectedBackground = $(this).val();
             $('body').css('background-image', 'url("Backgrounds/' + selectedBackground + '")');
-            var opacityValue = $('#opacity-slider').val();
+        });
+
+        $('#opacity-slider').on('input', function() {
+            var opacityValue = $(this).val();
             $('.checklist, .note, .table-panel, .process-panel').css('opacity', opacityValue);
-            var isBoardTitleVisible = $('#toggle-board-title').is(':checked');
+        });
+
+        $('#toggle-board-title').change(function() {
+            var isBoardTitleVisible = $(this).is(':checked');
             $('.editable-title').toggle(isBoardTitleVisible);
-            $('.settings-overlay').remove(); //close the overlay on save
         });
     }
 
-});
+    });
