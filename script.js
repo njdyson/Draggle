@@ -3,7 +3,7 @@ $(document).ready(function() {
    
     //User data - to be replaced with data from the server
     var username = "nick";
-    var timestamp = new Date().getTime(); // Get current timestamp
+    var timestamp = new Date().getTime().toString().slice(-8); // Get current timestamp
     var boardID = username.toUpperCase() + timestamp;
     lastboard = localStorage.getItem('lastLoadedBoard');
     
@@ -13,20 +13,7 @@ $(document).ready(function() {
     var panel_height = 300; // Define the default panel height
     var initial_pos_x = 0;
     var initial_pos_y = 0;
-
-    fetch(lastboard)
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log(data); // Here you can work with your JSON data
-    })
-    .catch(error => {
-        console.error('There has been a problem with your fetch operation:', error);
-    });
+    var highestZIndex = 100; // Set the initial z-index for panels
     
     makeSubtasksSortable();
     makeTitleEditable();
@@ -36,8 +23,8 @@ $(document).ready(function() {
         // Clear existing panels and notes
         $('.checklist, .note .table-panel .process-panel').remove();
 
-        var timestamp = new Date().getTime(); // Get current timestamp
-        var boardID = username + timestamp;
+        var timestamp = new Date().getTime().toString().slice(-8); // Get current timestamp
+        boardID = username + timestamp;
 
         // Set the board title
         $("#canvasTitle").text("New Board");
@@ -139,14 +126,19 @@ $(document).ready(function() {
             minWidth: panel_width,
             minHeight: panel_height,
             width: panel_width,
-            height: panel_height
+            height: panel_height,
+            zIndex: highestZIndex++
         })
         
         $('#' + panelId).draggable({
             handle: ".handle", // Specify the handle for dragging
             cancel: ".panel-title, .editable", // Specify elements to exclude from dragging
             grid: [grid_size, grid_size], // Set the grid size to snap to during dragging
-            containment: "#canvas" // Specify the containment element
+            containment: "#canvas", // Specify the containment element
+            start: function() {
+                // Increment the z-index global variable and apply it to the current panel
+                $(this).css('zIndex', ++highestZIndex);
+            }
         }).resizable({
             minHeight: panel_height, // Set the minimum height of the panel
             minWidth: panel_width, // Set the minimum width of the panel
@@ -172,7 +164,7 @@ $(document).ready(function() {
      // Event handler for adding a new todo item
      $(document).on('keypress', '.todo-input', function(e) {
         if (e.which == 13) {
-            var timestamp = new Date().getTime(); // Get current timestamp
+            var timestamp = new Date().getTime().toString().slice(-8);  // Get current timestamp
             var todoText = $(this).val();
             $(this).val('');
             var listItem = $(`<li class='todo-item' id='todo-${timestamp}'>
@@ -193,7 +185,7 @@ $(document).ready(function() {
     // Event handler to add a new step to the process panel
     $(document).on('keypress', '.process-input', function(e) {
         if (e.which == 13) { // Enter key pressed
-            var timestamp = new Date().getTime(); // Get current timestamp
+            var timestamp = new Date().getTime().toString().slice(-8);  // Get current timestamp
             var stepText = $(this).val();
             $(this).val(''); // Clear the input field after adding the step
             var listItem = $(`<li>
@@ -259,6 +251,18 @@ $(document).ready(function() {
 
     // Event handler for the Add Subtask action
     $(document).on('click', '#contextMenu [data-action="add-subtask"]', function() {
+        addSubtask.call(this);
+    });
+
+    // Event handler for pressing Enter on the .subtask .editable field
+    $(document).on('keypress', '.subtask .editable', function(e) {
+        if (e.which == 13) { // Enter key pressed
+            e.preventDefault(); // Prevent the default action (inserting a new line)
+            addSubtask.call(this);
+        }
+    });
+
+    function addSubtask() {
         var todoId = $(this).data('todo-id'); // Retrieve the todoId stored in data attribute
 
         // Use the todoId to find the specific <ul class='subtasks'> within the todo item
@@ -266,12 +270,12 @@ $(document).ready(function() {
 
         // Append the new subtask HTML to the <ul class='subtasks'>
         var uniqueSubtaskId = 'subtask-' + Date.now(); // Simple example for generating a unique ID
-        subtasksList.append('<li class="subtask" id="' + uniqueSubtaskId + '" data-due-date=""><input type="checkbox" class="todo-checkbox"/><span class="editable" placeholder="Subtask">Subtask</span></li>');
+        subtasksList.append('<li class="subtask" id="' + uniqueSubtaskId + '" data-due-date=""><input type="checkbox" class="todo-checkbox"/><span class="editable">Subtask</span></li>');
         makeSubtasksSortable();
-        
+
         // Cleanup: remove the context menu
         $('#contextMenu').remove();
-    });
+    }
 
     // Function to make subtasks sortable
     function makeSubtasksSortable() {
@@ -359,7 +363,8 @@ $(document).ready(function() {
             width: panel.outerWidth(),
             height: panel.outerHeight(),
             top: panel.position().top,
-            left: panel.position().left
+            left: panel.position().left,
+            zIndex: highestZIndex++
         });
     
         $('#canvas').append(overlay);
@@ -747,8 +752,9 @@ $(document).ready(function() {
     function toggleSettingsOverlay() {
         if ($('.settings-overlay').length === 0) {
             // Create the overlay if it doesn't exist
+            var isBoardTitleVisible = $('.editable-title').is(':visible'); // Check if the board title is visible
             var overlayHtml = `<div class="settings-overlay">
-                <div class="overlay-title">Settings</div>
+                <div class="overlay-title">Board Settings</div>
                 <div style="padding: 15px;">
                     <label for="board-id">Board ID:</label>
                     <span>${boardID}</span><br>
@@ -758,15 +764,24 @@ $(document).ready(function() {
                         <option value="Bridge.jpg">Bridge</option>
                         <option value="Road.jpg">Road</option>
                         <option value="Mist.jpg">Mist</option>
+                        <option value="Auora.jpg">Auora</option>
+                        <option value="Jagged.jpg">Jagged</option>
+                        <option value="Yosemite.jpg">Yosemite</option>
                         <!-- Add more options here -->
                     </select>
+                    <br>
+                    <label for="opacity-slider">Panel Opacity:</label>
+                    <input type="range" id="opacity-slider" class="overlay-slider" min="0.7" max="1" step="0.05" value="${$('.checklist, .note, .table-panel, .process-panel').css('opacity')}">
+                    <br>
+                    <label for="toggle-board-title">Show Board Title:</label>
+                    <input type="checkbox" id="toggle-board-title" class="overlay-checkbox" ${isBoardTitleVisible ? 'checked' : ''}> <!-- Set the 'checked' attribute based on the visibility of the board title -->
                 </div>
                 <div class="overlay-nav">
                     <button id='save-settings' class="overlay-button">Save</button>
                     <button id='close-overlay' class="overlay-button">Cancel</button>
                 </div>
             </div>`;
-    
+
             $('#canvas').append(overlayHtml);
         }
 
@@ -779,6 +794,10 @@ $(document).ready(function() {
         $('#save-settings').click(function() {
             var selectedBackground = $('#background-selector').val();
             $('body').css('background-image', 'url("Backgrounds/' + selectedBackground + '")');
+            var opacityValue = $('#opacity-slider').val();
+            $('.checklist, .note, .table-panel, .process-panel').css('opacity', opacityValue);
+            var isBoardTitleVisible = $('#toggle-board-title').is(':checked');
+            $('.editable-title').toggle(isBoardTitleVisible);
             $('.settings-overlay').remove(); //close the overlay on save
         });
     }

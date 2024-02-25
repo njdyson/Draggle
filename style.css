@@ -4,7 +4,7 @@ body, html {
     height: 100%;
     font-family: Arial, Helvetica, sans-serif;
     background-image: url("Backgrounds/Rice.jpg");
-    background-size: cover;
+    background-size: 100% 100%; 
     overflow: hidden; /* Prevent scrolling beyond viewport */
     font-size: 14px;
     
@@ -27,9 +27,10 @@ body, html {
     flex-direction: column;
     overflow-x: hidden; /* Ensure content doesn't overflow */
     overflow-y: hidden;
-    opacity: 0.9;
+    opacity: 1;
     border-radius: 5px;
     box-sizing: border-box;
+    backdrop-filter: blur(10px);
 }
 
 /* Scrollbars */
@@ -185,10 +186,16 @@ body, html {
 .editable {
     flex-grow: 1; /* Allow the editable area to fill the space */
     margin: 5px; /* Spacing for aesthetics */
+    min-height: 5px; /* Prevents the content from collapsing when empty */
 }
 
 .editable:focus {
     outline: none; /* Remove the default focus outline */
+}
+
+.editable:empty:before {
+    padding: 20px;
+    min-height: 20px;
 }
 
 .sortable-placeholder {
@@ -233,7 +240,7 @@ body, html {
     justify-content: center; /* Center the buttons horizontally */
     opacity: 0;
     flex-direction: row;
-    z-index: 1000;
+    z-index: 10000;
     margin:10px;
     transition-duration: 1s;
 }
@@ -266,27 +273,19 @@ body, html {
   }
   
 
-  .editable-title {
+.editable-title, .title-input{
     text-align: center;
     cursor: pointer;
     color: #ffffff;
-    opacity: 0.3;
-    font-size: 28px;
-    background-color: #383838;
+    opacity: 0.7;
+    font-size: 36px;
     width: 100%;
-    padding:5px;
-}
-
-.title-input {
+    padding: 5px;
+    outline: none;
     background: transparent;
     border-style: none;
-    /* Remove the border property */
-    /* Retain other styles for consistent appearance */
-    text-align: center;
-    width: 100%;
-    color: #ffffff;
-    font-size: 28px;
-    padding:5px;
+    text-shadow: 1px 1px 5px #303030;
+    min-height: 20px; /* Prevents the title from collapsing when empty */
 }
 
 /* Enhancing table appearance */
@@ -508,7 +507,7 @@ body, html {
 .context-menu {
     display: none;
     position: absolute;
-    z-index: 1000;
+    z-index: 10000;
     width: 150px;
     background-color: #303030; /* Matching the panel background color */
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -548,11 +547,11 @@ body, html {
     background: #303030;
     color: #ffffff;
     box-sizing: border-box;
-    z-index: 1000;
+    z-index: 10000;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Add a box shadow */
 }
 
-.overlay-select {
+.overlay-select, .overlay-slider {
     width: 40%;
     background: #808080;
     vertical-align: middle; /* Align the element vertically */
@@ -569,7 +568,7 @@ body, html {
     border: none;
 }
 
-label {
+.settings-overlay label {
     display: inline-block;
     width: 140px;
     text-align: right;
