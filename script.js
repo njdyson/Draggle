@@ -756,6 +756,11 @@ $(document).ready(function() {
 
     function toggleSettingsOverlay() {
         if ($('.settings-overlay').length === 0) {
+            // Extract the current background image URL from the body's style
+            var currentBackgroundUrl = $('body').css('background-image');
+            // Use a regex to extract the filename from the URL
+            var match = /"([^"]+)"\)/.exec(currentBackgroundUrl) || /'([^']+)'/.exec(currentBackgroundUrl);
+            var currentBackground = match ? match[1].split('/').pop() : "";
             // Create the overlay if it doesn't exist
             var isBoardTitleVisible = $('.editable-title').is(':visible'); // Check if the board title is visible
             var overlayHtml = `<div class="settings-overlay">
@@ -765,7 +770,6 @@ $(document).ready(function() {
                     <span>${boardID}</span><br>
                     <label for="background-selector">Background:</label>
                     <select id="background-selector" class="overlay-select">
-                        <option value=""></option>
                         <option value="Rice.jpg">Rice</option>
                         <option value="Bridge.jpg">Bridge</option>
                         <option value="Road.jpg">Road</option>
@@ -788,28 +792,31 @@ $(document).ready(function() {
             </div>`;
 
             $('#canvas').append(overlayHtml);
+
+            // Prefill the background selector
+            $('#background-selector').val(currentBackground);
+
+            // Close button functionality
+            $('#close-overlay').click(function() {
+                $('.settings-overlay').remove();
+            });
+
+            // Event listeners for input elements
+            $('#background-selector').change(function() {
+                var selectedBackground = $(this).val();
+                $('body').css('background-image', 'url("Backgrounds/' + selectedBackground + '")');
+            });
+
+            $('#opacity-slider').on('input', function() {
+                var opacityValue = $(this).val();
+                $('.checklist, .note, .table-panel, .process-panel').css('opacity', opacityValue);
+            });
+
+            $('#toggle-board-title').change(function() {
+                var isBoardTitleVisible = $(this).is(':checked');
+                $('.editable-title').toggle(isBoardTitleVisible);
+            });
         }
-
-        // Close button functionality
-        $('#close-overlay').click(function() {
-            $('.settings-overlay').remove();
-        });
-
-        // Event listeners for input elements
-        $('#background-selector').change(function() {
-            var selectedBackground = $(this).val();
-            $('body').css('background-image', 'url("Backgrounds/' + selectedBackground + '")');
-        });
-
-        $('#opacity-slider').on('input', function() {
-            var opacityValue = $(this).val();
-            $('.checklist, .note, .table-panel, .process-panel').css('opacity', opacityValue);
-        });
-
-        $('#toggle-board-title').change(function() {
-            var isBoardTitleVisible = $(this).is(':checked');
-            $('.editable-title').toggle(isBoardTitleVisible);
-        });
     }
 
     });
