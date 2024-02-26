@@ -39,7 +39,9 @@ $(document).ready(function() {
         // HTML markup for the new panel
         var panelHtml = `<div class="checklist" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
         <div class="handle"></div> <!-- Handle for dragging the panel -->
-        <button class="delete-panel">X</button> <!-- Delete button -->
+        <div class="corner-buttons">
+            <button class="delete-panel">X</button> <!-- Delete button -->
+        </div>
         <input type="text" class="panel-title" value="Checklist ${checklistCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
         <ul class="todo-list"></ul> <!-- List for todo items -->
         <input type="text" class="todo-input" placeholder="Add new todo"/> <!-- Input field for adding new todos -->
@@ -57,7 +59,9 @@ $(document).ready(function() {
         var editorId = 'editor-' + noteCount; // Generate a unique ID for each editor instance
         var panelHtml = `<div class="note" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
             <div class="handle"></div>
-            <button class="delete-panel">X</button>
+            <div class="corner-buttons">
+                <button class="delete-panel">X</button>
+            </div>
             <div id="${editorId}"></div> <!-- Unique ID for the Quill editor container -->
         </div>`;
 
@@ -82,7 +86,9 @@ $(document).ready(function() {
     
         var panelHtml = `<div class="table-panel" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
             <div class="handle"></div>
-            <button class="delete-panel">X</button>
+            <div class="corner-buttons">
+                <button class="delete-panel">X</button>
+            </div>
             <input type="text" class="panel-title" value="Table ${tableCount}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
             <div class="table-container">
                 <table class="editable-table">
@@ -107,7 +113,9 @@ $(document).ready(function() {
     
         var panelHtml = `<div class="process-panel" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
             <div class="handle"></div>
-            <button class="delete-panel">X</button>
+            <div class="corner-buttons">
+                <button class="delete-panel">X</button>
+            </div>
             <input type="text" class="panel-title" value="Process ${processCount}">
             <ol class="process-list"></ol>
             <input type="text" class="process-input" placeholder="Add new step"/>
@@ -163,11 +171,33 @@ $(document).ready(function() {
         makePanelsInterconnected();
     }
 
+    $(document).on('dblclick', '.checklist, .note, .table-panel, .process-panel', function() {
+        const panel = $(this).closest('.checklist, .note, .table-panel, .process-panel');
+        const isMinimized = panel.hasClass('minimized');
+        const title = panel.find('.panel-title'); // Correctly find the .panel-title element
+        const cornerButtons = panel.find('.corner-buttons'); // Correctly find the .corner-buttons element
+    
+        if (!isMinimized) {
+            panel.data('original-size', { height: panel.height() });
+            // Minimise the panel
+            panel.addClass('minimized').css({ height: '35px', minHeight: '35px'});
+            panel.resizable("disable");            
+        } else {
+            // Maximise the panel
+            const originalSize = panel.data('original-size');
+            panel.removeClass('minimized').css({ height: originalSize.height + 'px', minHeight: '' });
+            panel.resizable("enable");
+            
+        }
+    });
+    
     function makePanelsInterconnected() {
         // Initialize sortable on all checklist todo lists and connect them
         $('.todo-list').sortable({
             connectWith: ".todo-list", // This allows dragging between all todo lists
             placeholder: "sortable-placeholder",
+            helper: 'clone', // Use a clone as the helper that follows the mouse
+            appendTo: 'body', // Append the helper to the body to ensure it's not confined
             start: function(event, ui) {
                 ui.item.addClass('being-dragged');
                 // Additional code as needed for when dragging starts

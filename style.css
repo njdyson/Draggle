@@ -79,7 +79,7 @@ body, html {
     height: 5px;
     background-color: #8b8b8b;
     border-radius: 5px;
-    margin: 8px auto 8px; /* Centered horizontally, thinner */
+    margin: 5px auto 5px; /* Centered horizontally, thinner */
     cursor: grab;
     top: 0px;
     opacity: 0.5;
@@ -93,6 +93,7 @@ body, html {
     width: 98%; /* Ensure it resizes with the panel */  
     padding-top: 10px;
     padding-left:15px;
+    padding-right:15px;
     margin: 0;
     list-style-type: none; /* Remove default list styling */
     overflow-y: auto; /* Add vertical scrollbar */
@@ -102,7 +103,7 @@ body, html {
     display: flex;
     flex-direction: column; /* Ensures vertical stacking of todo-content and subtasks */
     color: #ffffff;
-    padding: 5px 0;
+    padding: 5px;
 }
 
 .todo-content {
@@ -202,15 +203,24 @@ body, html {
 
 .sortable-placeholder {
     border: 1px dashed #ccc;
-    background: #f0f0f0;
+    background: #686868;
     height: 1.5rem;
-    margin: 5px 0; /* Match todo item margin for consistent spacing */
+    margin: 5px 0; /* Match todo item margin for consistent spacing */ 
+    padding-left:15px;
+    padding-right:15px;
 }
  
-.delete-panel {
+.corner-buttons {
     position: absolute;
-    top: 5px;
-    right: 3px;
+    top: 0;
+    right: 0;
+    display: flex; /* This will align the buttons in a row */
+    flex-direction: row; /* This ensures buttons line up horizontally */
+    align-items: center; /* This ensures buttons are vertically centered */
+    margin: 5px;
+  }
+  
+  .panel-settings, .delete-panel {
     background: none;
     color: #9c9c9c;
     border: none;
@@ -220,12 +230,14 @@ body, html {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.delete-panel:hover {
+    padding: 0 5px; /* Adjust padding as needed */
+  }
+  
+  /* Ensure consistency in button appearance and add a hover effect for better UI */
+  .panel-settings:hover, .delete-panel:hover {
+    opacity: 1; /* Increase opacity on hover for better visibility */
     color: #ffffff;
-    opacity: 1;
-}
+  }
 
 .completed {
     text-decoration: line-through;
@@ -575,4 +587,20 @@ body, html {
     width: 140px;
     text-align: right;
     padding: 10px;
+}
+
+.minimized {
+    overflow: hidden;
+    opacity: 0.5;
+  }
+  
+  .minimized .todo-list, /* Adjust according to your class structure */
+  .minimized .table-container,
+  .minimized .process-list,
+  .minimized .todo-input,
+  .minimized .panel-title,
+  .minimized .corner-buttons,
+  .minimized .ql-toolbar,
+.minimized .ql-container {
+    display: none;
 }
