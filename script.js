@@ -146,6 +146,20 @@ $(document).ready(function() {
             start: function() {
                 // Increment the z-index global variable and apply it to the current panel
                 $(this).css('zIndex', ++highestZIndex);
+            },
+            stop: function() {
+                // Check if the panel is minimized
+                if ($(this).hasClass('minimized')) {
+                    // Calculate the viewport height and the panel's bottom position
+                    var viewportHeight = $(window).height() - 60;
+                    var panelBottom = $(this).offset().top + $(this).outerHeight();
+        
+                    // Check if the panel's bottom is at or beyond the bottom of the viewport
+                    if (panelBottom >= viewportHeight) {
+                        // Trigger the popup
+                        alert('Minimized Panel ID: ' + $(this).attr('id') + ' is touching the bottom of the screen.');
+                    }
+                }
             }
         }).resizable({
             minHeight: panel_height, // Set the minimum height of the panel
@@ -174,18 +188,16 @@ $(document).ready(function() {
     $(document).on('dblclick', '.checklist, .note, .table-panel, .process-panel', function() {
         const panel = $(this).closest('.checklist, .note, .table-panel, .process-panel');
         const isMinimized = panel.hasClass('minimized');
-        const title = panel.find('.panel-title'); // Correctly find the .panel-title element
-        const cornerButtons = panel.find('.corner-buttons'); // Correctly find the .corner-buttons element
-    
+
         if (!isMinimized) {
             panel.data('original-size', { height: panel.height() });
             // Minimise the panel
-            panel.addClass('minimized').css({ height: '35px', minHeight: '35px'});
-            panel.resizable("disable");            
+            panel.addClass('minimized').css({ height: '35px', minHeight: '35px', marginBottom: '50px'});
+            panel.resizable("disable");                            
         } else {
             // Maximise the panel
             const originalSize = panel.data('original-size');
-            panel.removeClass('minimized').css({ height: originalSize.height + 'px', minHeight: '' });
+            panel.removeClass('minimized').css({ height: originalSize.height + 'px', minHeight: '', marginBottom: '' });
             panel.resizable("enable");
             
         }
@@ -364,6 +376,19 @@ $(document).ready(function() {
         contextMenu.style.top = `${pageY}px`;
         contextMenu.style.left = `${pageX}px`;
         contextMenu.classList.add('show');
+    }
+
+    // Function to check if two elements are touching or overlapping
+    function isTouching(a, b) {
+        var aRect = a.getBoundingClientRect();
+        var bRect = b.getBoundingClientRect();
+
+        return !(
+            aRect.bottom < bRect.top || 
+            aRect.top > bRect.bottom || 
+            aRect.right < bRect.left || 
+            aRect.left > bRect.right
+        );
     }
 
     // Event handler to attach context menu to subtasks
