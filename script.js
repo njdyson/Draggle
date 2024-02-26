@@ -159,6 +159,32 @@ $(document).ready(function() {
         
         // Call the sortable function for checklist panels
         makePanelSortable(panelId, 'todo-list');
+
+        makePanelsInterconnected();
+    }
+
+    function makePanelsInterconnected() {
+        // Initialize sortable on all checklist todo lists and connect them
+        $('.todo-list').sortable({
+            connectWith: ".todo-list", // This allows dragging between all todo lists
+            placeholder: "sortable-placeholder",
+            start: function(event, ui) {
+                ui.item.addClass('being-dragged');
+                // Additional code as needed for when dragging starts
+            },
+            stop: function(event, ui) {
+                ui.item.removeClass('being-dragged');
+                // Additional code as needed for when dragging stops
+            },
+            receive: function(event, ui) {
+                // Optional: code to execute when an item is received from another list
+            },
+            update: function(event, ui) {
+                if (this === ui.item.parent()[0]) {
+                    // Optional: code to execute to handle the update within the same list
+                }
+            }
+        }).disableSelection();
     }
 
      // Event handler for adding a new todo item
