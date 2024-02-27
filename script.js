@@ -258,7 +258,6 @@ $(document).ready(function() {
             $(this).val(''); // Clear the input field after adding the step
             var listItem = $(`<li>
                 <span class="process-item" id='process-${timestamp}'>${stepText}</span>
-                <button class="edit-process-btn" data-process-id='process-${timestamp}'>...</button>
                 <div class="process-description"></div> <!-- Placeholder for description -->
                 </li>`); 
             listItem.data('description', 'Description'); // Store the description as part of the todo item's data
@@ -323,6 +322,51 @@ $(document).ready(function() {
         
         addSubtask(todoId);
     });
+
+    $(document).ready(function() {
+        // Correct the initial event binding to process items for showing the context menu
+        $(document).on('contextmenu', '.process-item', function(event) {
+            event.preventDefault();
+            var processId = $(this).attr('id');
+            showProcessContextMenu(processId, event.pageX, event.pageY);
+            return false; // Prevent the browser's default context menu
+        });
+    
+        // Use delegated event handling for dynamically added context menu items
+        $(document).on('click', '#process-context-menu [data-action="edit"]', function(event) {
+            event.stopPropagation();
+            var processId = $(this).data('process-id');
+            createProcessOverlayPanel(processId);
+            $('#process-context-menu').remove(); // Close the context menu
+        });
+    
+        $(document).on('click', '#process-context-menu [data-action="delete"]', function(event) {
+            event.stopPropagation();
+            var processId = $(this).data('process-id');
+            // Implement your logic to confirm and delete the process item
+            $('#process-context-menu').remove(); // Close the context menu
+        });
+    
+        // Also consider adding a global click listener to close the context menu when clicking elsewhere
+        $(document).on('click', function() {
+            $('#process-context-menu').remove();
+        });
+
+        function showProcessContextMenu(processId, pageX, pageY) {
+            // Remove existing context menus
+            $('#process-context-menu').remove();
+        
+            // Construct the context menu HTML
+            const menuHtml = `<ul id='process-context-menu' class='context-menu' style='position:absolute; top:${pageY}px; left:${pageX}px;'>
+                <li class="context-menu-item" data-action="edit" data-process-id="${processId}">Edit</li>
+                <li class="context-menu-item" data-action="delete" data-process-id="${processId}">Delete</li>
+            </ul>`;
+        
+            // Append the menu to the body and show it
+            $('body').append(menuHtml);
+        }
+    
+    });   
 
     // Event handler for pressing Enter on the .subtask .editable field
     $(document).on('keypress', '.subtask .editable', function(e) {

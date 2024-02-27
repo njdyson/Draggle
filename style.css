@@ -373,29 +373,6 @@ body, html {
     user-select: none; /* Prevent text selection */
 }
 
-.edit-todo-btn {
-    padding: 5px 5px;
-    font-size: 12px;
-    color: #fff;
-    border: none; /* Correctly remove the border */
-    background: none; /* Correctly remove the background */
-    border-radius: 4px;
-    cursor: pointer;
-    margin-left: 2px; /* Space between buttons */
-    opacity: 0.6;
-    /* Remove 'position: absolute' and 'right: 10px;' to avoid absolute positioning conflicts */
-    /* display: inline-block; is not necessary when parent is flex */
-}
-
-.edit-todo-btn:hover, .edit-process-btn:hover {
-    background-color: #424242;
-}
-
-.edit-todo-btn:focus, .edit-process-btn:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(0,123,255,.25);
-}
-
 .overlay-panel {
     position: absolute;
     border: none;
@@ -406,7 +383,7 @@ body, html {
     overflow: hidden; /* Ensure content doesn't overflow */
     border-radius: 5px;
     box-sizing: border-box;
-    
+    z-index: 10000;
 }
 
 .overlay-title {
@@ -594,13 +571,14 @@ body, html {
     transition: width 0.5s;
   }
   
-  .minimized .todo-list, /* Adjust according to your class structure */
-  .minimized .table-container,
-  .minimized .process-list,
-  .minimized .todo-input,
-  .minimized .panel-title,
-  .minimized .corner-buttons,
-  .minimized .ql-toolbar,
+.minimized .todo-list, /* Adjust according to your class structure */
+.minimized .table-container,
+.minimized .process-list,
+.minimized .todo-input,
+.minimized .process-input,
+.minimized .panel-title,
+.minimized .corner-buttons,
+.minimized .ql-toolbar,
 .minimized .ql-container {
     display: none;
 }
