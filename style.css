@@ -17,7 +17,7 @@ body, html {
     overflow: hidden;
 }
 
-.checklist, .note, .table-panel, .process-panel {
+.panel {
     padding: 10px;
     position: absolute;
     border: none;

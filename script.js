@@ -21,7 +21,7 @@ $(document).ready(function() {
     //Function to create a new board
     function newBoard() {
         // Clear existing panels and notes
-        $('.checklist, .note .table-panel .process-panel').remove();
+        $('.panel').remove();
 
         var timestamp = new Date().getTime().toString().slice(-8); // Get current timestamp
         boardID = username + timestamp;
@@ -37,7 +37,7 @@ $(document).ready(function() {
         var panelId = 'checklist-' + checklistCount;
     
         // HTML markup for the new panel
-        var panelHtml = `<div class="checklist" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
+        var panelHtml = `<div class="panel checklist" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
         <div class="handle"></div> <!-- Handle for dragging the panel -->
         <div class="corner-buttons">
             <button class="delete-panel">X</button> <!-- Delete button -->
@@ -57,7 +57,7 @@ $(document).ready(function() {
         var panelId = 'note-' + noteCount;
 
         var editorId = 'editor-' + noteCount; // Generate a unique ID for each editor instance
-        var panelHtml = `<div class="note" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
+        var panelHtml = `<div class="panel note" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
             <div class="handle"></div>
             <div class="corner-buttons">
                 <button class="delete-panel">X</button>
@@ -84,7 +84,7 @@ $(document).ready(function() {
         var tableCount = $('.table-panel').length + 1;
         var panelId = 'table-' + tableCount;
     
-        var panelHtml = `<div class="table-panel" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
+        var panelHtml = `<div class="panel table-panel" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
             <div class="handle"></div>
             <div class="corner-buttons">
                 <button class="delete-panel">X</button>
@@ -111,7 +111,7 @@ $(document).ready(function() {
         var processCount = $('.process-panel').length + 1;
         var panelId = 'process-' + processCount;
     
-        var panelHtml = `<div class="process-panel" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
+        var panelHtml = `<div class="panel process-panel" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
             <div class="handle"></div>
             <div class="corner-buttons">
                 <button class="delete-panel">X</button>
@@ -119,6 +119,25 @@ $(document).ready(function() {
             <input type="text" class="panel-title" value="Process ${processCount}">
             <ol class="process-list"></ol>
             <input type="text" class="process-input" placeholder="Add new step"/>
+        </div>`;
+    
+        createPanel(panelHtml, panelId);
+
+    });
+
+    // Event handler for adding a new process panel
+    $('#addLinkTree').click(function() {
+        var linksCount = $('.link-tree').length + 1;
+        var panelId = 'links-' + linksCount;
+    
+        var panelHtml = `<div class="panel links-panel" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
+            <div class="handle"></div>
+            <div class="corner-buttons">
+                <button class="delete-panel">X</button>
+            </div>
+            <input type="text" class="panel-title" value="Link Tree ${linksCount}">
+            <ol class="link-list"></ol>
+            <input type="text" class="link-input" placeholder="Add new link"/>
         </div>`;
     
         createPanel(panelHtml, panelId);
@@ -185,8 +204,8 @@ $(document).ready(function() {
         makePanelsInterconnected();
     }
 
-    $(document).on('dblclick', '.checklist, .note, .table-panel, .process-panel', function() {
-        const panel = $(this).closest('.checklist, .note, .table-panel, .process-panel');
+    $(document).on('dblclick', '.panel', function() {
+        const panel = $(this).closest('.panel');
         const isMinimized = panel.hasClass('minimized');
 
         if (!isMinimized) {
@@ -608,7 +627,7 @@ $(document).ready(function() {
     // Event handler for deleting a panel or note
     $(document).on('click', '.delete-panel', function() {
         if (confirm('Are you sure you want to delete this panel/note?')) {
-            $(this).closest('.checklist, .note, .table-panel, .process-panel').remove();
+            $(this).closest('.panel').remove();
         }
     });
 
@@ -906,7 +925,7 @@ $(document).ready(function() {
                     </select>
                     <br>
                     <label for="opacity-slider">Panel Opacity:</label>
-                    <input type="range" id="opacity-slider" class="overlay-slider" min="0.7" max="1" step="0.05" value="${$('.checklist, .note, .table-panel, .process-panel').css('opacity')}">
+                    <input type="range" id="opacity-slider" class="overlay-slider" min="0.7" max="1" step="0.05" value="${$('.panel').css('opacity')}">
                     <br>
                     <label for="toggle-board-title">Show Board Title:</label>
                     <input type="checkbox" id="toggle-board-title" class="overlay-checkbox" ${isBoardTitleVisible ? 'checked' : ''}> <!-- Set the 'checked' attribute based on the visibility of the board title -->
@@ -934,7 +953,7 @@ $(document).ready(function() {
 
             $('#opacity-slider').on('input', function() {
                 var opacityValue = $(this).val();
-                $('.checklist, .note, .table-panel, .process-panel').css('opacity', opacityValue);
+                $('.panel').css('opacity', opacityValue);
             });
 
             $('#toggle-board-title').change(function() {
