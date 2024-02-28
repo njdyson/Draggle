@@ -125,9 +125,9 @@ $(document).ready(function() {
 
     });
 
-    // Event handler for adding a new process panel
-    $('#addLinkTree').click(function() {
-        var linksCount = $('.link-tree').length + 1;
+    // Event handler for adding a new links panel
+    $('#addLinkPanel').click(function() {
+        var linksCount = $('.links').length + 1;
         var panelId = 'links-' + linksCount;
     
         var panelHtml = `<div class="panel links-panel" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
@@ -135,9 +135,9 @@ $(document).ready(function() {
             <div class="corner-buttons">
                 <button class="delete-panel">X</button>
             </div>
-            <input type="text" class="panel-title" value="Link Tree ${linksCount}">
+            <input type="text" class="panel-title" value="Links ${linksCount}">
             <ol class="link-list"></ol>
-            <input type="text" class="link-input" placeholder="Add new link"/>
+            <button class="add-link-button">+</button>
         </div>`;
     
         createPanel(panelHtml, panelId);
