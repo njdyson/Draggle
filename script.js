@@ -29,20 +29,25 @@ $(document).ready(function() {
         $("#canvasTitle").text("New Board");
     }
 
-    $.ajax({
-        url: 'fetchBoard.php', 
-        type: 'GET', // or 'POST', depending on your requirements
-        dataType: 'json', // Expect JSON in response
-        success: function(response) {
-            // Handle success
-            console.log('Success:', response);
-            loadBoardFromData(response);
-        },
-        error: function(xhr, status, error) {
-            // Handle error
-            console.log('Error:', error);
-        }
-    });
+    function fetchBoardData() {
+        $.ajax({
+            url: 'fetchBoard.php', 
+            type: 'GET', // or 'POST', depending on your requirements
+            dataType: 'json', // Expect JSON in response
+            success: function(response) {
+                // Handle success
+                console.log('Success:', response);
+                loadBoardFromData(response);
+            },
+            error: function(xhr, status, error) {
+                // Handle error
+                console.log('Error:', error);
+            }
+        });
+    }
+
+    // Call the function
+    fetchBoardData();
 
     // Event handler for adding a new checklist
     $('#addChecklist').click(function() {
