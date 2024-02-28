@@ -47,7 +47,7 @@ $(document).ready(function() {
     }
 
     // Call the function
-    fetchBoardData();
+    //fetchBoardData();
 
     // Event handler for adding a new checklist
     $('#addChecklist').click(function() {
@@ -862,7 +862,7 @@ $(document).ready(function() {
     function loadBoardFromData(boardData) {
                 
         // Clear existing panels and notes
-        $('.checklist, .note').remove();
+        $('.panel').remove();
 
         // Reset panel count if necessary
         var checklistCount = 0;
@@ -875,30 +875,58 @@ $(document).ready(function() {
         boardData.items.forEach(function(item) {
             if (item.type === 'checklist') {
                 checklistCount++;
-                var panelHtml = `
-                    <div class="checklist" id="${item.id}" style="left:${item.location.left}; top:${item.location.top}; width: ${item.size.width}px; height: ${item.size.height}px;">
-                        <div class="handle"></div>
-                        <button class="delete-panel">X</button>
-                        <input type="text" class="panel-title" value="${item.title}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
-                        <ul class="todo-list">${item.content}</ul>
-                        <input type="text" class="todo-input" placeholder="Add new item"/>
-                    </div>`;
+                // Step 1: Initialize the list items HTML string
+                var listItemsHtml = '';
+        
+                // Step 2: Loop through the todos and build the list items HTML
+                item.todos.forEach(function(todo) {    
+                    var listItem = $(`<li class='todo-item' id='${itemId}'>
+                        <div class="todo-content"> <!-- This div wraps the inline elements -->
+                            <input type="checkbox" class="todo-checkbox"/>
+                            <span class="editable">${todo.text}</span>
+                            <div class="due-by">${todo.subtasks}</div> <!-- Placeholder for date -->
+                        </div>
+                        <ul class='subtasks'></ul>
+                    </li>`);
+
+                    // Store the description and date data items
+                    listItem.data('description', description);
+                    listItem.data('date', date);
+
+                    // Append the listItem to the listItemsHtml
+                    listItemsHtml += listItem[0].outerHTML;
+                });
+        
+                //Construct the panelHtml including the generated listItemsHtml
+                var panelHtml = `<div class="panel checklist" id="${item.id}" style="left:${item.location.left}px; top:${item.location.top}px; width: ${item.size.width}px; height: ${item.size.height}px;">
+                                    <div class="handle"></div> <!-- Handle for dragging the panel -->
+                                    <div class="corner-buttons">
+                                        <button class="delete-panel">X</button> <!-- Delete button -->
+                                    </div>
+                                    <input type="text" class="panel-title" value="${item.title}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
+                                    <ul class="todo-list">${listItemsHtml}</ul>
+                                    <input type="text" class="todo-input" placeholder="Add new todo"/>
+                                    </div>`;
             }
             else if (item.type === 'note') {
                 noteCount++;
                 var panelHtml = `
-                    <div class="note" id="${item.id}" style="left:${item.location.left}; top:${item.location.top}; width: ${item.size.width}px; height: ${item.size.height}px;">
+                    <div class="panel note" id="${item.id}" style="left:${item.location.left}; top:${item.location.top}; width: ${item.size.width}px; height: ${item.size.height}px;">
                         <div class="handle"></div>
-                        <button class="delete-panel">X</button>
+                        <div class="corner-buttons">
+                            <button class="delete-panel">X</button>
+                        </div>
                         <input type="text" class="panel-title" value="${item.title}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
                         <div class="note-body" contenteditable="true">${item.content}</div>
                     </div>`;
             }
             else if (item.type === 'table') {
                 var panelHtml = `
-                    <div class="table-panel" id="${item.id}" style="left:${item.location.left}; top:${item.location.top}; width: ${item.size.width}px; height: ${item.size.height}px;">
+                    <div class="panel table-panel" id="${item.id}" style="left:${item.location.left}; top:${item.location.top}; width: ${item.size.width}px; height: ${item.size.height}px;">
                         <div class="handle"></div>
-                        <button class="delete-panel">X</button>
+                        <div class="corner-buttons">
+                            <button class="delete-panel">X</button>
+                        </div>
                         <input type="text" class="panel-title" value="Table ${item.title}" onfocus="this.select()" onkeyup="if(event.keyCode==13) {this.blur();}">
                         <div class="table-container">
                         <table class="editable-table">${item.content}</table>
