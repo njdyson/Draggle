@@ -5,7 +5,6 @@ $(document).ready(function() {
     var username = "nick";
     var timestamp = new Date().getTime().toString().slice(-8); // Get current timestamp
     var boardID = username.toUpperCase() + timestamp;
-    lastboard = localStorage.getItem('lastLoadedBoard');
     
     // Declare vaiables
     var grid_size = 10;
@@ -29,6 +28,21 @@ $(document).ready(function() {
         // Set the board title
         $("#canvasTitle").text("New Board");
     }
+
+    $.ajax({
+        url: 'fetchBoard.php', 
+        type: 'GET', // or 'POST', depending on your requirements
+        dataType: 'json', // Expect JSON in response
+        success: function(response) {
+            // Handle success
+            console.log('Success:', response);
+            loadBoardFromData(response);
+        },
+        error: function(xhr, status, error) {
+            // Handle error
+            console.log('Error:', error);
+        }
+    });
 
     // Event handler for adding a new checklist
     $('#addChecklist').click(function() {
