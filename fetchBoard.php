@@ -2,34 +2,12 @@
 // Set header to indicate the response type is JSON
 header('Content-Type: application/json');
 
-// Hardcoded JSON data as an array
-$boardData = json_decode('{
-    "boardTitle": "Test Board",
-    "boardID": "NICK38567331",
-    "items": [
-        {
-            "id": "checklist-1",
-            "type": "checklist",
-            "location": {
-                "top": "120px",
-                "left": "220px"
-            },
-            "size": {
-                "width": 380,
-                "height": 280
-            },
-            "title": "My Checklist",
-            "todos": [
-                {
-                    "text": "Item 1",
-                    "description": "",
-                    "subtasks": ""
-                }
-            ]
-        }
-    ]
-}', true);
+// Read the JSON data from the file
+$boardData = file_get_contents('/Boards/Basecamp.json');
+
+// Convert the JSON string to an array
+$boardDataArray = json_decode($boardData, true);
 
 // Convert the array to a JSON string
-echo json_encode($boardData);
+echo json_encode($boardDataArray);
 ?>
