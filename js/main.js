@@ -1,21 +1,20 @@
-// When the document is ready, execute this function
-$(document).ready(function() { 
-   
-    //User data - to be replaced with data from the server
-    var username = "nick";
-    var timestamp = new Date().getTime().toString().slice(-8); // Get current timestamp
-    var boardID = username.toUpperCase() + timestamp;
-    
-    // Declare vaiables
-    var grid_size = 10;
-    var panel_width = 400; // Define the default panel width
-    var panel_height = 300; // Define the default panel height
-    var initial_pos_x = 0;
-    var initial_pos_y = 0;
-    var highestZIndex = 100; // Set the initial z-index for panels
-    
-    makeSubtasksSortable();
-    makeTitleEditable();
+var Draggle = {
+    username: "nick",
+    boardID: "",
+    grid_size: 10,
+    panel_width: 400,
+    panel_height: 300,
+    initial_pos_x: 0,
+    initial_pos_y: 0,
+    highestZIndex: 100
+};
+
+$(document).ready(function() {
+    var timestamp = new Date().getTime().toString().slice(-8);
+    Draggle.boardID = Draggle.username.toUpperCase() + timestamp;
+
+    Draggle.makeSubtasksSortable();
+    Draggle.makeTitleEditable();
 
     //Function to create a new board
     function newBoard() {
@@ -23,11 +22,13 @@ $(document).ready(function() {
         $('.panel').remove();
 
         var timestamp = new Date().getTime().toString().slice(-8); // Get current timestamp
-        boardID = username + timestamp;
+        Draggle.boardID = Draggle.username + timestamp;
 
         // Set the board title
         $("#canvasTitle").text("New Board");
     }
+
+    Draggle.newBoard = newBoard;
 
     function fetchBoardData() {
         $.ajax({
@@ -37,7 +38,7 @@ $(document).ready(function() {
             success: function(response) {
                 // Handle success
                 console.log('Success:', response);
-                loadBoardFromData(response);
+                Draggle.loadBoardFromData(response);
             },
             error: function(xhr, status, error) {
                 // Handle error
@@ -56,7 +57,7 @@ $(document).ready(function() {
         var panelId = 'checklist-' + checklistCount;
     
         // HTML markup for the new panel
-        var panelHtml = `<div class="panel checklist" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
+        var panelHtml = `<div class="panel checklist" id="${panelId}" style="left:${Draggle.initial_pos_x}px; top:${Draggle.initial_pos_y}px;">
         <div class="handle"></div> <!-- Handle for dragging the panel -->
         <div class="corner-buttons">
             <button class="delete-panel">X</button> <!-- Delete button -->
@@ -66,7 +67,7 @@ $(document).ready(function() {
         <input type="text" class="todo-input" placeholder="Add new todo"/> <!-- Input field for adding new todos -->
         </div>`;
 
-        createPanel(panelHtml, panelId);
+        Draggle.createPanel(panelHtml, panelId);
     });
 
     // Event handler for adding a new note
@@ -76,7 +77,7 @@ $(document).ready(function() {
         var panelId = 'note-' + noteCount;
 
         var editorId = 'editor-' + noteCount; // Generate a unique ID for each editor instance
-        var panelHtml = `<div class="panel note" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
+        var panelHtml = `<div class="panel note" id="${panelId}" style="left:${Draggle.initial_pos_x}px; top:${Draggle.initial_pos_y}px;">
             <div class="handle"></div>
             <div class="corner-buttons">
                 <button class="delete-panel">X</button>
@@ -84,7 +85,7 @@ $(document).ready(function() {
             <div id="${editorId}"></div> <!-- Unique ID for the Quill editor container -->
         </div>`;
 
-        createPanel(panelHtml, panelId);
+        Draggle.createPanel(panelHtml, panelId);
 
         const toolbarOptions = [[{ 'header': 1 }, { 'header': 2 },'bold', 'italic', 'underline', 'strike',{ 'color': [] }], 
         [{ 'list': 'bullet' }, { 'list': 'ordered'}],['code-block', 'link']];
@@ -103,7 +104,7 @@ $(document).ready(function() {
         var tableCount = $('.table-panel').length + 1;
         var panelId = 'table-' + tableCount;
     
-        var panelHtml = `<div class="panel table-panel" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
+        var panelHtml = `<div class="panel table-panel" id="${panelId}" style="left:${Draggle.initial_pos_x}px; top:${Draggle.initial_pos_y}px;">
             <div class="handle"></div>
             <div class="corner-buttons">
                 <button class="delete-panel">X</button>
@@ -119,9 +120,9 @@ $(document).ready(function() {
             <div class="add-column-symbol">+</div>
         </div>`;
     
-        createPanel(panelHtml, panelId);
+        Draggle.createPanel(panelHtml, panelId);
         // Call function to make table cells editable
-        makeCellsEditable();
+        Draggle.makeCellsEditable();
         positionPlusSymbols(panelId);
     });
 
@@ -130,7 +131,7 @@ $(document).ready(function() {
         var processCount = $('.process-panel').length + 1;
         var panelId = 'process-' + processCount;
     
-        var panelHtml = `<div class="panel process-panel" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
+        var panelHtml = `<div class="panel process-panel" id="${panelId}" style="left:${Draggle.initial_pos_x}px; top:${Draggle.initial_pos_y}px;">
             <div class="handle"></div>
             <div class="corner-buttons">
                 <button class="delete-panel">X</button>
@@ -140,7 +141,7 @@ $(document).ready(function() {
             <input type="text" class="process-input" placeholder="Add new step"/>
         </div>`;
     
-        createPanel(panelHtml, panelId);
+        Draggle.createPanel(panelHtml, panelId);
 
     });
 
@@ -149,7 +150,7 @@ $(document).ready(function() {
         var linksCount = $('.links').length + 1;
         var panelId = 'links-' + linksCount;
     
-        var panelHtml = `<div class="panel links-panel" id="${panelId}" style="left:${initial_pos_x}px; top:${initial_pos_y}px;">
+        var panelHtml = `<div class="panel links-panel" id="${panelId}" style="left:${Draggle.initial_pos_x}px; top:${Draggle.initial_pos_y}px;">
             <div class="handle"></div>
             <div class="corner-buttons">
                 <button class="delete-panel">X</button>
@@ -159,7 +160,7 @@ $(document).ready(function() {
             <button class="add-link-button">+</button>
         </div>`;
     
-        createPanel(panelHtml, panelId);
+        Draggle.createPanel(panelHtml, panelId);
 
     });
 
@@ -170,20 +171,20 @@ $(document).ready(function() {
 
         $('#' + panelId).css({
             minWidth: 250,
-            minHeight: panel_height,
-            width: panel_width,
-            height: panel_height,
-            zIndex: highestZIndex++
+            minHeight: Draggle.panel_height,
+            width: Draggle.panel_width,
+            height: Draggle.panel_height,
+            zIndex: Draggle.highestZIndex++
         })
         
         $('#' + panelId).draggable({
             handle: ".handle", // Specify the handle for dragging
             cancel: ".panel-title, .editable", // Specify elements to exclude from dragging
-            grid: [grid_size, grid_size], // Set the grid size to snap to during dragging
+            grid: [Draggle.grid_size, Draggle.grid_size], // Set the grid size to snap to during dragging
             containment: "#canvas", // Specify the containment element
             start: function() {
                 // Increment the z-index global variable and apply it to the current panel
-                $(this).css('zIndex', ++highestZIndex);
+                $(this).css('zIndex', ++Draggle.highestZIndex);
             },
             stop: function() {
                 // Check if the panel is minimized
@@ -200,9 +201,9 @@ $(document).ready(function() {
                 }
             }
         }).resizable({
-            minHeight: panel_height, // Set the minimum height of the panel
+            minHeight: Draggle.panel_height, // Set the minimum height of the panel
             minWidth: 250, // Set the minimum width of the panel
-            grid: [grid_size, grid_size] // Set the grid size to snap to during resizing
+            grid: [Draggle.grid_size, Draggle.grid_size] // Set the grid size to snap to during resizing
         });
 
         function makePanelSortable(panelId, listClass) {
@@ -222,6 +223,8 @@ $(document).ready(function() {
 
         makePanelsInterconnected();
     }
+
+    Draggle.createPanel = createPanel;
 
     $(document).on('dblclick', '.panel', function() {
         const panel = $(this).closest('.panel');
@@ -266,6 +269,8 @@ $(document).ready(function() {
             }
         }).disableSelection();
     }
+
+    Draggle.makePanelsInterconnected = makePanelsInterconnected;
 
      // Event handler for adding a new todo item
      $(document).on('keypress', '.todo-input', function(e) {
@@ -335,7 +340,7 @@ $(document).ready(function() {
 
         // Add event listener for the Edit todo item action
         contextMenu.querySelector('[data-action="edit"]').addEventListener('click', function() {
-            createOverlayPanel(todoId); // Call createOverlayPanel with the todoId
+            Draggle.createOverlayPanel(todoId); // Call createOverlayPanel with the todoId
         });
 
         // Close and remove the context menu on document click
@@ -374,7 +379,7 @@ $(document).ready(function() {
         $(document).on('click', '#process-context-menu [data-action="edit"]', function(event) {
             event.stopPropagation();
             var processId = $(this).data('process-id');
-            createProcessOverlayPanel(processId);
+            Draggle.createProcessOverlayPanel(processId);
             $('#process-context-menu').remove(); // Close the context menu
         });
     
@@ -424,13 +429,15 @@ $(document).ready(function() {
         var subtasksList = $('#' + todoId).find('.subtasks');
         var uniqueSubtaskId = 'subtask-' + Date.now();
         subtasksList.append('<li class="subtask" id="' + uniqueSubtaskId + '" data-due-date=""><input type="checkbox" class="todo-checkbox"/><span class="editable" contenteditable="true" tabindex="-1"></span></li>');
-        makeSubtasksSortable();
+        Draggle.makeSubtasksSortable();
 
         // Focus on the newly created .editable field
         $('#' + uniqueSubtaskId + ' .editable').focus();
 
         $('#contextMenu').remove();
     }
+
+    Draggle.addSubtask = addSubtask;
 
     // Function to make subtasks sortable
     function makeSubtasksSortable() {
@@ -444,6 +451,8 @@ $(document).ready(function() {
             }
         }).disableSelection(); // Prevent text selection during dragging
     }
+
+    Draggle.makeSubtasksSortable = makeSubtasksSortable;
 
     // Function to show the subtask context menu
     function showSubtaskContextMenu(subtaskId, pageX, pageY) {
@@ -532,7 +541,7 @@ $(document).ready(function() {
             height: panel.outerHeight(),
             top: panel.position().top,
             left: panel.position().left,
-            zIndex: highestZIndex++
+            zIndex: Draggle.highestZIndex++
         });
     
         $('#canvas').append(overlay);
@@ -578,8 +587,10 @@ $(document).ready(function() {
 
             // Remove overlay panel after saving
             overlayPanel.remove();
-        });       
-    }    
+        });
+    }
+
+    Draggle.createOverlayPanel = createOverlayPanel;
 
     // Function to create an overlay for the process panel to edit details
     function createProcessOverlayPanel(processId) {
@@ -638,9 +649,11 @@ $(document).ready(function() {
             listItem.data('description', description); // Store the updated description in the data of the <li>
             listItem.find('.process-description').text(description); // Update the description display, which is a <div>
 
-            overlayPanel.remove(); // Remove overlay panel after saving
+        overlayPanel.remove(); // Remove overlay panel after saving
         });
     }
+
+    Draggle.createProcessOverlayPanel = createProcessOverlayPanel;
 
 
     // Event handler for deleting a panel or note
@@ -686,6 +699,8 @@ $(document).ready(function() {
         });
     }
 
+    Draggle.makeCellsEditable = makeCellsEditable;
+
     $(document).on('click', '.add-row-symbol', function() {
         var $table = $(this).siblings('.table-container').find('table');
         var $lastRow = $table.find('tr:last');
@@ -709,13 +724,13 @@ $(document).ready(function() {
         });
     
         // Call function to make new cells editable
-        makeCellsEditable();
+        Draggle.makeCellsEditable();
 
     });
     
     $(document).on('click', '.edit-process-btn', function() {
         var processId = $(this).attr('data-process-id');
-        createProcessOverlayPanel(processId);
+        Draggle.createProcessOverlayPanel(processId);
     });
 
     // Event handler for updating todo item text
@@ -732,12 +747,12 @@ $(document).ready(function() {
 
     // Event handler for saving the text file when the saveToFile button is pressed
     $('#saveToFile').click(function() {
-        saveTextFile();
+        Draggle.saveTextFile();
     });
 
     // Event handler for clearing the board when the newBoard button is pressed
     $('#newBoard').click(function() {
-        newBoard();
+        Draggle.newBoard();
     });
 
     function makeTitleEditable() {
@@ -758,6 +773,8 @@ $(document).ready(function() {
         });
     }
 
+    Draggle.makeTitleEditable = makeTitleEditable;
+
     // Function to save a text file to a local folder
     function saveTextFile() {
         var boardData = collectBoardData();
@@ -775,10 +792,12 @@ $(document).ready(function() {
         URL.revokeObjectURL(url);
     }
 
+    Draggle.saveTextFile = saveTextFile;
+
     function collectBoardData() {
         var boardData = {
             boardTitle: $("#canvasTitle").text(),
-            boardID: boardID,
+            boardID: Draggle.boardID,
             items: []
         };
     
@@ -798,12 +817,14 @@ $(document).ready(function() {
     
         // Convert the boardData object to JSON
         return JSON.stringify(boardData, null, 2); // Pretty-print the JSON
-    }    
+    }
+
+    Draggle.collectBoardData = collectBoardData;
     
     document.getElementById('loadBoard').addEventListener('click', function() {
         // Programmatically click the hidden file input
         document.getElementById('loadBoardFile').click();
-        loadBoardFromData(boardData);
+        Draggle.loadBoardFromData(boardData);
     });
     
     document.getElementById('loadBoardFile').addEventListener('change', function() {
@@ -813,7 +834,7 @@ $(document).ready(function() {
     
             reader.onload = function(e) {
                 var boardData = JSON.parse(e.target.result);
-                loadBoardFromData(boardData);
+                Draggle.loadBoardFromData(boardData);
             };
     
             reader.readAsText(file);
@@ -836,13 +857,15 @@ $(document).ready(function() {
     
             // Append the panel HTML to the board or a specific container within the board
             // This assumes you have a function createPanel that does the appending based on the HTML and possibly sets up additional behaviors
-            createPanel(panelHtml, item.id);
+            Draggle.createPanel(panelHtml, item.id);
         });
-    }    
+    }
+
+    Draggle.loadBoardFromData = loadBoardFromData;
     
     // Add an event listener for the settings button
     document.getElementById('settings').addEventListener('click', function() {
-        toggleSettingsOverlay(); // Call function to toggle the visibility of the settings overlay
+        Draggle.toggleSettingsOverlay(); // Call function to toggle the visibility of the settings overlay
     });
 
     function toggleSettingsOverlay() {
@@ -858,7 +881,7 @@ $(document).ready(function() {
                 <div class="overlay-title">Board Settings</div>
                 <div style="padding: 15px;">
                     <label for="board-id">Board ID:</label>
-                    <span>${boardID}</span><br>
+                    <span>${Draggle.boardID}</span><br>
                     <label for="background-selector">Background:</label>
                     <select id="background-selector" class="overlay-select">
                         <option value="Rice.jpg">Rice</option>
@@ -909,5 +932,7 @@ $(document).ready(function() {
             });
         }
     }
+
+    Draggle.toggleSettingsOverlay = toggleSettingsOverlay;
 
     });
