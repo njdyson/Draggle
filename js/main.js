@@ -149,7 +149,7 @@ $(document).ready(function() {
     $('#addLinkPanel').click(function() {
         var linksCount = $('.links').length + 1;
         var panelId = 'links-' + linksCount;
-    
+
         var panelHtml = `<div class="panel links-panel" id="${panelId}" style="left:${Draggle.initial_pos_x}px; top:${Draggle.initial_pos_y}px;">
             <div class="handle"></div>
             <div class="corner-buttons">
@@ -159,7 +159,7 @@ $(document).ready(function() {
             <ol class="link-list"></ol>
             <button class="add-link-button">+</button>
         </div>`;
-    
+
         Draggle.createPanel(panelHtml, panelId);
 
     });
@@ -654,6 +654,108 @@ $(document).ready(function() {
     }
 
     Draggle.createProcessOverlayPanel = createProcessOverlayPanel;
+
+    // Handle adding links from the links panel
+    $(document).on('click', '.add-link-button', function() {
+        var panelId = $(this).closest('.links-panel').attr('id');
+        Draggle.createLinkOverlayPanel(panelId);
+    });
+
+    // Handle clicking a link item to navigate in the same window
+    $(document).on('click', '.link-item', function() {
+        var destination = $(this).data('url');
+        if (destination) {
+            window.location.href = destination;
+        }
+    });
+
+    // Right-click context menu for link items
+    $(document).on('contextmenu', '.link-item', function(event) {
+        event.preventDefault();
+        var linkId = $(this).attr('id');
+        showLinkContextMenu(linkId, event.pageX, event.pageY);
+        return false;
+    });
+
+    $(document).on('click', '#link-context-menu [data-action="edit-link"]', function(event) {
+        event.stopPropagation();
+        var linkId = $(this).data('link-id');
+        var panelId = $('#' + linkId).closest('.links-panel').attr('id');
+        Draggle.createLinkOverlayPanel(panelId, linkId);
+        $('#link-context-menu').remove();
+    });
+
+    $(document).on('click', function() {
+        $('#link-context-menu').remove();
+    });
+
+    function showLinkContextMenu(linkId, pageX, pageY) {
+        $('#link-context-menu').remove();
+
+        var menuHtml = `<ul id='link-context-menu' class='context-menu' style='position:absolute; top:${pageY}px; left:${pageX}px;'>
+                <li class="context-menu-item" data-action="edit-link" data-link-id="${linkId}">Edit</li>
+            </ul>`;
+
+        $('body').append(menuHtml);
+    }
+
+    function createLinkOverlayPanel(panelId, linkId = null) {
+        $('.overlay-panel').remove();
+
+        var panel = $('#' + panelId);
+        var listItem = linkId ? $('#' + linkId) : null;
+
+        var titleValue = listItem ? listItem.find('.link-title').text() : '';
+        var urlValue = listItem ? listItem.data('url') : '';
+
+        var overlayHtml = `<div class="overlay-panel">
+            <div class="overlay-title" style='text-align:center;background-color:#202020;'>${linkId ? 'Edit Link' : 'Add Link'}</div>
+            <div style="padding: 10px;">
+                <label for="link-title" style='color: #ffffff;'>Title</label><br>
+                <input type="text" id="link-title" class="item-line" value="${titleValue}" onfocus="this.select()">
+                <label for="link-destination" style='color: #ffffff;'>Destination</label>
+                <input type="text" id="link-destination" class="item-line" value="${urlValue}" onfocus="this.select()">
+                <div class="overlay-nav">
+                    <button id='save-link' class="overlay-button">Save</button>
+                    <button id='cancel-link' class="overlay-button">Cancel</button>
+                </div>
+            </div>
+        </div>`;
+
+        var overlay = $(overlayHtml).css({
+            width: panel.outerWidth(),
+            height: panel.outerHeight(),
+            top: panel.position().top,
+            left: panel.position().left
+        });
+
+        $('#canvas').append(overlay);
+
+        overlay.find('#cancel-link').click(function() {
+            overlay.remove();
+        });
+
+        $('#canvas').off('click', '#save-link').on('click', '#save-link', function() {
+            var overlayPanel = $(this).closest('.overlay-panel');
+            var title = overlayPanel.find('#link-title').val();
+            var url = overlayPanel.find('#link-destination').val();
+            var linkList = panel.find('.link-list');
+
+            if (linkId) {
+                var existingItem = $('#' + linkId);
+                existingItem.find('.link-title').text(title);
+                existingItem.data('url', url);
+            } else {
+                var newId = 'link-' + Date.now();
+                var linkItem = $(`<li class="link-item" id="${newId}" data-url="${url}"><span class="link-title">${title}</span></li>`);
+                linkList.append(linkItem);
+            }
+
+            overlayPanel.remove();
+        });
+    }
+
+    Draggle.createLinkOverlayPanel = createLinkOverlayPanel;
 
 
     // Event handler for deleting a panel or note

@@ -528,6 +528,24 @@ body, html {
     background-color: #505050; /* Slightly lighter than item background for hover state */
 }
 
+.links-panel .link-list {
+    list-style: none;
+    padding: 10px;
+    margin: 0;
+}
+
+.links-panel .link-item {
+    padding: 8px 10px;
+    color: #ffffff;
+    cursor: pointer;
+    border-bottom: 1px solid #404040;
+    user-select: none;
+}
+
+.links-panel .link-item:hover {
+    background-color: #404040;
+}
+
 .settings-overlay {
     position: fixed;
     top: 50%;
