@@ -1,0 +1,27 @@
+{
+  "name": "draggle",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/njdyson/ProjectBoard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/njdyson/ProjectBoard/issues"
+  },
+  "homepage": "https://github.com/njdyson/ProjectBoard#readme",
+  "dependencies": {
+    "espree": "^11.0.0"
+  }
+}

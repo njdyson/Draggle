@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Draggle</title>
+    <script>
+        (function() {
+            try {
+                var bg = localStorage.getItem('lastBackground');
+                if (bg) {
+                    document.documentElement.style.setProperty('--initial-background', 'url("Backgrounds/' + bg + '")');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
     <link href="quill.css" rel="stylesheet" />
     <link href="style.css" rel="stylesheet">
@@ -13,7 +23,6 @@
 
 
 <div id="canvas">
-    <input type="file" id="loadBoardFile" accept=".json" style="display: none;">
     <div id="canvasTitle" class="editable-title">New Board</div>
     <div id="bottom-nav" class="navbar">
         <button id="addChecklist" class="button">Add Checklist</button>
@@ -23,8 +32,7 @@
         <button id="addLinkPanel">Add Links</button>
         <div style="width:20px;"></div>
         <button id="newBoard">New Board</button>
-        <button id="loadBoard">Load Board</button>
-        <button id="saveToFile" class="button">Save to File</button>
+        <button id="deleteBoard">Delete Board</button>
         <button id="settings" class="button">Board Settings</button>
     </div>
 </div>
@@ -34,6 +42,11 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.2/dist/quill.js"></script>
-<script src="js/main.js"></script>
+<script src="panels.js"></script>
+<script src="tables.js"></script>
+<script src="context-menus.js"></script>
+<script src="persistence.js"></script>
+<script src="ui.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
